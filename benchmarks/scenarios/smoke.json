@@ -1,0 +1,10 @@
+{
+  "name": "smoke-10-clusters-100-nodes",
+  "seed": 20260911,
+  "inventory": {
+    "clusters": 10,
+    "nodes": 100,
+    "distribution": "balanced",
+    "readyFraction": 0.9
+  }
+}

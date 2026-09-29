@@ -1,0 +1,5 @@
+{
+  "name": "balanced-c050-n1000",
+  "seed": 20260911,
+  "inventory": {"clusters": 50, "nodes": 1000, "distribution": "balanced", "readyFraction": 0.99}
+}

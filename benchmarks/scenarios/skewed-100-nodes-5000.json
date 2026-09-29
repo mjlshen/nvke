@@ -1,0 +1,10 @@
+{
+  "name": "skewed-100-clusters-5000-nodes",
+  "seed": 20260911,
+  "inventory": {
+    "clusters": 100,
+    "nodes": 5000,
+    "distribution": "skewed",
+    "readyFraction": 0.99
+  }
+}

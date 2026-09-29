@@ -1,0 +1,10 @@
+{
+  "name": "cluster-axis-100-clusters-5000-nodes",
+  "seed": 20260911,
+  "inventory": {
+    "clusters": 100,
+    "nodes": 5000,
+    "distribution": "balanced",
+    "readyFraction": 0.99
+  }
+}

@@ -72,7 +72,7 @@ problem is noise, not coverage.
 Revalidating on a newer stack adds a sibling `scenario-<version>.yaml` in the
 same directory, sharing the engine config.
 
-## Not included
+## What the published cluster workload recipes exclude
 
 | | |
 |---|---|
@@ -164,3 +164,11 @@ Apache 2.0 — see [LICENSE](../LICENSE).
 
 Each scenario's `upstream.project` names the project its engine configuration
 comes from.
+
+## CWE management-plane harness
+
+The repository also contains an executable harness for controller component and
+steady-state measurements. See [the CWE harness guide](cwe_perf/README.md) for
+setup, commands, scenario files, result format and reproducibility controls.
+Its synthetic inventories and raw runs are separate from the published
+Kubernetes workload recipes described above.

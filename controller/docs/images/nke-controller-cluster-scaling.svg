@@ -1,0 +1,130 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1135" viewBox="0 0 1200 1135" role="img" aria-labelledby="title desc">
+  <title id="title">Cluster-driven scaling</title>
+  <desc id="desc">Three plots compare synthetic estimates with live CAPD measurements for goroutines, resident memory, and PostgreSQL connections as cluster count grows.</desc>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #20252A; }
+    .figure-title { font-size: 30px; font-weight: 600; }
+    .legend { font-size: 18px; font-weight: 600; }
+    .panel-title { font-size: 24px; font-weight: 600; }
+    .panel-subtitle, .annotation, .footer { font-size: 16px; fill: #57606A; }
+    .tick { font-size: 16px; fill: #57606A; }
+    .axis-title, .series-label { font-size: 17px; font-weight: 600; }
+    .frame { fill: #FFFFFF; stroke: #687078; stroke-width: 1.5; }
+    .grid { stroke: #D8DEE4; stroke-width: 1; }
+    .tick-mark { stroke: #687078; stroke-width: 1.5; }
+  </style>
+  <rect width="100%" height="100%" fill="#FFFFFF" />
+  <text class="figure-title" x="70" y="52">Cluster-driven scaling</text>
+  <line x1="720" y1="44" x2="766" y2="44" stroke="#0072B2" stroke-width="5" stroke-dasharray="9 7" />
+  <text class="legend" x="780" y="51">Synthetic</text>
+  <line x1="930" y1="44" x2="976" y2="44" stroke="#D55E00" stroke-width="5" />
+  <text class="legend" x="990" y="51">Live CAPD</text>
+  <text class="panel-title" x="120" y="95">Persistent concurrency</text>
+<text class="panel-subtitle" x="120" y="120">Both environments are approximately linear in tenant cluster count.</text>
+<rect class="frame" x="120" y="145" width="1010" height="215" />
+<line class="grid" x1="120" y1="360.0" x2="1130" y2="360.0" />
+<text class="tick" x="106" y="365.0" text-anchor="end">0</text>
+<line class="grid" x1="120" y1="288.3" x2="1130" y2="288.3" />
+<text class="tick" x="106" y="293.3" text-anchor="end">2k</text>
+<line class="grid" x1="120" y1="216.7" x2="1130" y2="216.7" />
+<text class="tick" x="106" y="221.7" text-anchor="end">4k</text>
+<line class="grid" x1="120" y1="145.0" x2="1130" y2="145.0" />
+<text class="tick" x="106" y="150.0" text-anchor="end">6k</text>
+<line class="tick-mark" x1="120.0" y1="360" x2="120.0" y2="367" />
+<text class="tick" x="120.0" y="388" text-anchor="middle">0</text>
+<line class="tick-mark" x1="221.0" y1="360" x2="221.0" y2="367" />
+<text class="tick" x="221.0" y="388" text-anchor="middle">10</text>
+<line class="tick-mark" x1="625.0" y1="360" x2="625.0" y2="367" />
+<text class="tick" x="625.0" y="388" text-anchor="middle">50</text>
+<line class="tick-mark" x1="1130.0" y1="360" x2="1130.0" y2="367" />
+<text class="tick" x="1130.0" y="388" text-anchor="middle">100</text>
+<text class="axis-title" x="625" y="415" text-anchor="middle">Tenant clusters</text>
+<text class="axis-title" transform="translate(50 252) rotate(-90)" text-anchor="middle">Goroutines</text>
+<polyline points="221.0,340.5 625.0,263.1 1130.0,166.4" fill="none" stroke="#0072B2" stroke-width="4" stroke-dasharray="9 7" />
+<circle cx="221.0" cy="340.5" r="7" fill="#0072B2" stroke="#0072B2" stroke-width="4" />
+<circle cx="625.0" cy="263.1" r="7" fill="#0072B2" stroke="#0072B2" stroke-width="4" />
+<circle cx="1130.0" cy="166.4" r="7" fill="#0072B2" stroke="#0072B2" stroke-width="4" />
+<text class="series-label" fill="#0072B2" x="1118.0" y="156.4" text-anchor="end">Synthetic measured</text>
+<polyline points="120.0,348.7 170.5,335.7 221.0,325.5 322.0,300.4" fill="none" stroke="#D55E00" stroke-width="4" />
+<circle cx="120.0" cy="348.7" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<circle cx="170.5" cy="335.7" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<circle cx="221.0" cy="325.5" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<circle cx="322.0" cy="300.4" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<text class="series-label" fill="#D55E00" x="334.0" y="290.4" text-anchor="start">Live measured</text>
+<text class="panel-title" x="120" y="435">Resident memory</text>
+<text class="panel-subtitle" x="120" y="460">Synthetic envelope joins the live baseline to the measured 100-cluster / 5,000-node result.</text>
+<rect class="frame" x="120" y="485" width="1010" height="215" />
+<line class="grid" x1="120" y1="700.0" x2="1130" y2="700.0" />
+<text class="tick" x="106" y="705.0" text-anchor="end">0</text>
+<line class="grid" x1="120" y1="657.0" x2="1130" y2="657.0" />
+<text class="tick" x="106" y="662.0" text-anchor="end">100</text>
+<line class="grid" x1="120" y1="571.0" x2="1130" y2="571.0" />
+<text class="tick" x="106" y="576.0" text-anchor="end">300</text>
+<line class="grid" x1="120" y1="485.0" x2="1130" y2="485.0" />
+<text class="tick" x="106" y="490.0" text-anchor="end">500</text>
+<line class="tick-mark" x1="120.0" y1="700" x2="120.0" y2="707" />
+<text class="tick" x="120.0" y="728" text-anchor="middle">0</text>
+<line class="tick-mark" x1="221.0" y1="700" x2="221.0" y2="707" />
+<text class="tick" x="221.0" y="728" text-anchor="middle">10</text>
+<line class="tick-mark" x1="625.0" y1="700" x2="625.0" y2="707" />
+<text class="tick" x="625.0" y="728" text-anchor="middle">50</text>
+<line class="tick-mark" x1="1130.0" y1="700" x2="1130.0" y2="707" />
+<text class="tick" x="1130.0" y="728" text-anchor="middle">100</text>
+<text class="axis-title" x="625" y="755" text-anchor="middle">Tenant clusters</text>
+<text class="axis-title" transform="translate(50 592) rotate(-90)" text-anchor="middle">CWE RSS (MiB)</text>
+<polyline points="120.0,661.0 221.0,646.4 625.0,587.8 1130.0,514.7" fill="none" stroke="#0072B2" stroke-width="4" stroke-dasharray="9 7" />
+<circle cx="120.0" cy="661.0" r="7" fill="#0072B2" stroke="#0072B2" stroke-width="4" />
+<circle cx="221.0" cy="646.4" r="7" fill="#0072B2" stroke="#0072B2" stroke-width="4" />
+<circle cx="625.0" cy="587.8" r="7" fill="#0072B2" stroke="#0072B2" stroke-width="4" />
+<circle cx="1130.0" cy="514.7" r="7" fill="#0072B2" stroke="#0072B2" stroke-width="4" />
+<text class="series-label" fill="#0072B2" x="1118.0" y="504.7" text-anchor="end">Synthetic envelope</text>
+<polyline points="120.0,661.0 170.5,648.1 221.0,636.3 322.0,619.3" fill="none" stroke="#D55E00" stroke-width="4" />
+<circle cx="120.0" cy="661.0" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<circle cx="170.5" cy="648.1" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<circle cx="221.0" cy="636.3" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<circle cx="322.0" cy="619.3" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<text class="series-label" fill="#D55E00" x="334.0" y="609.3" text-anchor="start">Live measured</text>
+<text class="panel-title" x="120" y="775">PostgreSQL connections and pool pressure</text>
+<text class="panel-subtitle" x="120" y="800">Synthetic demand assumes one active source per cluster and is capped by the harness pool.</text>
+<rect class="frame" x="120" y="825" width="1010" height="215" />
+<line class="grid" x1="120" y1="1040.0" x2="1130" y2="1040.0" />
+<text class="tick" x="106" y="1045.0" text-anchor="end">0</text>
+<line class="grid" x1="120" y1="954.0" x2="1130" y2="954.0" />
+<text class="tick" x="106" y="959.0" text-anchor="end">16</text>
+<line class="grid" x1="120" y1="911.0" x2="1130" y2="911.0" />
+<text class="tick" x="106" y="916.0" text-anchor="end">24</text>
+<line class="grid" x1="120" y1="868.0" x2="1130" y2="868.0" />
+<text class="tick" x="106" y="873.0" text-anchor="end">32</text>
+<line class="grid" x1="120" y1="825.0" x2="1130" y2="825.0" />
+<text class="tick" x="106" y="830.0" text-anchor="end">40</text>
+<line class="tick-mark" x1="120.0" y1="1040" x2="120.0" y2="1047" />
+<text class="tick" x="120.0" y="1068" text-anchor="middle">0</text>
+<line class="tick-mark" x1="221.0" y1="1040" x2="221.0" y2="1047" />
+<text class="tick" x="221.0" y="1068" text-anchor="middle">10</text>
+<line class="tick-mark" x1="625.0" y1="1040" x2="625.0" y2="1047" />
+<text class="tick" x="625.0" y="1068" text-anchor="middle">50</text>
+<line class="tick-mark" x1="1130.0" y1="1040" x2="1130.0" y2="1047" />
+<text class="tick" x="1130.0" y="1068" text-anchor="middle">100</text>
+<text class="axis-title" x="625" y="1095" text-anchor="middle">Tenant clusters</text>
+<text class="axis-title" transform="translate(50 932) rotate(-90)" text-anchor="middle">Connections / backends</text>
+<polyline points="120.0,1034.6 221.0,980.9 625.0,868.0 1130.0,868.0" fill="none" stroke="#0072B2" stroke-width="4" stroke-dasharray="9 7" />
+<circle cx="120.0" cy="1034.6" r="7" fill="#0072B2" stroke="#0072B2" stroke-width="4" />
+<circle cx="221.0" cy="980.9" r="7" fill="#0072B2" stroke="#0072B2" stroke-width="4" />
+<circle cx="625.0" cy="868.0" r="7" fill="#0072B2" stroke="#0072B2" stroke-width="4" />
+<circle cx="1130.0" cy="868.0" r="7" fill="#0072B2" stroke="#0072B2" stroke-width="4" />
+<text class="series-label" fill="#0072B2" x="1118.0" y="856.0" text-anchor="end">Synthetic demand model</text>
+<polyline points="120.0,954.0 170.5,954.0 221.0,954.0 322.0,954.0" fill="none" stroke="#D55E00" stroke-width="4" />
+<circle cx="120.0" cy="954.0" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<circle cx="170.5" cy="954.0" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<circle cx="221.0" cy="954.0" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<circle cx="322.0" cy="954.0" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<text class="series-label" fill="#D55E00" x="334.0" y="978.0" text-anchor="start">Live full-stack backends</text>
+<circle cx="322.0" cy="911.0" r="7" fill="#D55E00" stroke="#D55E00" stroke-width="4" />
+<circle cx="322.0" cy="937.9" r="7" fill="#FFFFFF" stroke="#D55E00" stroke-width="4" />
+<text class="annotation" x="625.0" y="892.0" text-anchor="middle">~19.7k pool waits</text>
+<text class="annotation" x="1125.0" y="892.0" text-anchor="end">~19.9k waits</text>
+<text class="annotation" x="336.0" y="903.0" text-anchor="start">40 nodes</text>
+<text class="annotation" x="336.0" y="929.9" text-anchor="start">100 nodes, post-restart</text>
+  <text class="footer" x="70" y="1113">Dashed lines are modeled estimates. Live PostgreSQL values are pg_stat_database backends; synthetic waits are measured.</text>
+</svg>
