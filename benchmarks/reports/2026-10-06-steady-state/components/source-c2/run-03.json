@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "mode": "node-source",
+  "scenario": {
+    "name": "cluster-axis-100-clusters-5000-nodes",
+    "seed": 20260911,
+    "clusters": 100,
+    "nodes": 5000,
+    "distribution": "balanced",
+    "ready_fraction": 0.99
+  },
+  "startedAt": "2026-10-06T15:40:00.495871Z",
+  "environment": {
+    "architecture": "arm64",
+    "goMaxProcs": 12,
+    "goVersion": "go1.27.1",
+    "os": "darwin",
+    "revision": "a4b4f2a21cf3344ca19138ed4f5bbe099f430cb4"
+  },
+  "phases": [
+    {
+      "name": "fixture-seed",
+      "durationMs": 334.589
+    },
+    {
+      "name": "db-node-source-startup",
+      "durationMs": 7660.226,
+      "metrics": {
+        "databaseErrors": 0,
+        "databaseQueries": 200,
+        "databaseWaitCount": 0,
+        "databaseWaitNanos": 0,
+        "estimatedRowsLoaded": 1000000,
+        "eventsConsumedCumulative": 10000,
+        "gcCycles": 279,
+        "gcPauseNanos": 23998647,
+        "heapAllocDeltaBytes": 28770952,
+        "heapObjectsDelta": 48359,
+        "mallocsDelta": 17100614,
+        "sourceConcurrency": 2,
+        "sources": 200,
+        "targetEventsCumulative": 10000,
+        "totalAllocDeltaBytes": 7213045344
+      }
+    },
+    {
+      "name": "db-node-source-resync-01",
+      "durationMs": 7398.526,
+      "metrics": {
+        "databaseErrors": 0,
+        "databaseQueries": 200,
+        "databaseWaitCount": 0,
+        "databaseWaitNanos": 0,
+        "estimatedRowsLoaded": 1000000,
+        "eventsConsumedCumulative": 20000,
+        "gcCycles": 230,
+        "gcPauseNanos": 16900580,
+        "heapAllocDeltaBytes": 33667736,
+        "heapObjectsDelta": 65559,
+        "mallocsDelta": 17089182,
+        "sourceConcurrency": 2,
+        "sources": 200,
+        "targetEventsCumulative": 20000,
+        "totalAllocDeltaBytes": 7203064856
+      }
+    },
+    {
+      "name": "db-node-source-resync-02",
+      "durationMs": 7436.674,
+      "metrics": {
+        "databaseErrors": 0,
+        "databaseQueries": 200,
+        "databaseWaitCount": 0,
+        "databaseWaitNanos": 0,
+        "estimatedRowsLoaded": 1000000,
+        "eventsConsumedCumulative": 30000,
+        "gcCycles": 239,
+        "gcPauseNanos": 22168543,
+        "heapAllocDeltaBytes": 19803192,
+        "heapObjectsDelta": 39854,
+        "mallocsDelta": 17089264,
+        "sourceConcurrency": 2,
+        "sources": 200,
+        "targetEventsCumulative": 30000,
+        "totalAllocDeltaBytes": 7203229664
+      }
+    },
+    {
+      "name": "db-node-source-resync-03",
+      "durationMs": 7372.19,
+      "metrics": {
+        "databaseErrors": 0,
+        "databaseQueries": 200,
+        "databaseWaitCount": 0,
+        "databaseWaitNanos": 0,
+        "estimatedRowsLoaded": 1000000,
+        "eventsConsumedCumulative": 40000,
+        "gcCycles": 226,
+        "gcPauseNanos": 19551840,
+        "heapAllocDeltaBytes": 24477032,
+        "heapObjectsDelta": 52057,
+        "mallocsDelta": 17088599,
+        "sourceConcurrency": 2,
+        "sources": 200,
+        "targetEventsCumulative": 40000,
+        "totalAllocDeltaBytes": 7202648648
+      }
+    }
+  ],
+  "metrics": {
+    "database": {
+      "errors": 0,
+      "idleConnections": 2,
+      "inUseConnections": 0,
+      "maxIdleClosed": 0,
+      "maxIdleTimeClosed": 0,
+      "maxLifetimeClosed": 0,
+      "maxOpenConnections": 32,
+      "openConnections": 2,
+      "queries": 821,
+      "waitCount": 0,
+      "waitDurationNanos": 0
+    },
+    "runtime": {
+      "gcCycles": 992,
+      "gcPauseTotalNanos": 83623821,
+      "goroutines": 1004,
+      "heapAllocBytes": 46381920,
+      "heapObjects": 84338,
+      "totalAllocBytes": 28928694752
+    }
+  },
+  "errors": []
+}

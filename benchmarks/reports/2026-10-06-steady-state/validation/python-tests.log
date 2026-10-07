@@ -1,0 +1,29 @@
+test_removes_only_prior_generated_results (test_matrix.MatrixSummaryTest.test_removes_only_prior_generated_results) ... ok
+test_summarizes_measured_phases_and_excludes_seed (test_matrix.MatrixSummaryTest.test_summarizes_measured_phases_and_excludes_seed) ... ok
+test_balanced_inventory_is_deterministic (test_model.ScenarioTest.test_balanced_inventory_is_deterministic) ... ok
+test_load_rejects_more_clusters_than_nodes (test_model.ScenarioTest.test_load_rejects_more_clusters_than_nodes) ... ok
+test_skewed_inventory_preserves_totals (test_model.ScenarioTest.test_skewed_inventory_preserves_totals) ... ok
+test_absent_queue_metrics_do_not_mean_idle_queues (test_observations.ObservationSummaryTest.test_absent_queue_metrics_do_not_mean_idle_queues) ... ok
+test_failed_scrape_with_null_fields_is_preserved (test_observations.ObservationSummaryTest.test_failed_scrape_with_null_fields_is_preserved) ... ok
+test_resource_trend_and_busy_queue_remain_visible (test_observations.ObservationSummaryTest.test_resource_trend_and_busy_queue_remain_visible) ... ok
+test_restart_separates_counters_and_missing_metrics (test_observations.ObservationSummaryTest.test_restart_separates_counters_and_missing_metrics) ... ok
+test_kubernetes_generated_approval (test_protobuf.ProtobufApprovalTest.test_kubernetes_generated_approval) ... ok
+test_rejects_wrong_target_and_truncated_wire (test_protobuf.ProtobufApprovalTest.test_rejects_wrong_target_and_truncated_wire) ... ok
+test_suite_exits_with_an_idle_tenant_watch (test_steady_state.SteadyStateShutdownTest.test_suite_exits_with_an_idle_tenant_watch) ... running cleanup repetition 1/1
+ok
+test_case_names_are_unique (test_steady_state.SteadyStateTest.test_case_names_are_unique) ... ok
+test_summary_preserves_failed_runs_and_does_not_average_booleans (test_steady_state.SteadyStateTest.test_summary_preserves_failed_runs_and_does_not_average_booleans) ... ok
+test_admin_event_updates_node (test_tenant_api.VirtualTenantAPITest.test_admin_event_updates_node) ... ok
+test_csr_can_be_added_and_approved (test_tenant_api.VirtualTenantAPITest.test_csr_can_be_added_and_approved) ... ok
+test_deterministic_dependency_failure (test_tenant_api.VirtualTenantAPITest.test_deterministic_dependency_failure) ... ok
+test_fault_configuration_rejects_unknown_cluster (test_tenant_api.VirtualTenantAPITest.test_fault_configuration_rejects_unknown_cluster) ... ok
+test_lists_only_token_cluster_nodes (test_tenant_api.VirtualTenantAPITest.test_lists_only_token_cluster_nodes) ... ok
+test_path_prefix_selects_cluster_without_http_credentials (test_tenant_api.VirtualTenantAPITest.test_path_prefix_selects_cluster_without_http_credentials) ... ok
+test_protobuf_approval_preserves_spec_and_counts_once (test_tenant_api.VirtualTenantAPITest.test_protobuf_approval_preserves_spec_and_counts_once) ... ok
+test_rejects_missing_token (test_tenant_api.VirtualTenantAPITest.test_rejects_missing_token) ... ok
+test_runtime_outage_is_scoped_and_recovers (test_tenant_api.VirtualTenantAPITest.test_runtime_outage_is_scoped_and_recovers) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 0.145s
+
+OK

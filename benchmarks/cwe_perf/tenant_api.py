@@ -11,6 +11,8 @@ import json
 from typing import Any
 from urllib.parse import parse_qs, urlsplit
 
+from .protobuf import decode_csr_approval
+
 
 class VirtualTenantAPI:
     def __init__(self, inventory: dict[str, Any], latency_ms: int = 0, failure_every: int = 0) -> None:
@@ -46,6 +48,8 @@ class VirtualTenantAPI:
         self._cluster_requests.clear()
         self._dependency_failures = 0
         self._resource_version = 1
+        self._outage_clusters: set[int] = set()
+        self._csr_approvals = 0
 
     async def serve(self, host: str, port: int) -> asyncio.AbstractServer:
         return await asyncio.start_server(self._handle_connection, host, port)
@@ -136,8 +140,14 @@ class VirtualTenantAPI:
                     "nodes": sum(len(nodes) for nodes in self._nodes.values()),
                     "dependencyFailures": self._dependency_failures,
                     "configuredLatencyMs": self._latency * 1000,
+                    "outageClusters": sorted(self._outage_clusters),
+                    "csrApprovals": self._csr_approvals,
                 },
             )
+            return
+        if path == "/__admin/reset" and method == "POST":
+            await self.reset()
+            await self._send_json(writer, 200, {"reset": True})
             return
         if path == "/__admin/node-event" and method == "POST":
             await self._admin_node_event(writer, body)
@@ -145,11 +155,18 @@ class VirtualTenantAPI:
         if path == "/__admin/csr-event" and method == "POST":
             await self._admin_csr_event(writer, body)
             return
+        if path == "/__admin/faults" and method == "POST":
+            await self._admin_faults(writer, body)
+            return
 
         if cluster is None:
             await self._send_json(writer, 401, {"kind": "Status", "status": "Failure", "reason": "Unauthorized"})
             return
         cluster_index = int(cluster["index"])
+        if cluster_index in self._outage_clusters:
+            self._dependency_failures += 1
+            await self._send_json(writer, 503, {"kind": "Status", "status": "Failure", "reason": "ServiceUnavailable"})
+            return
         self._cluster_requests[cluster_index] += 1
         if self._latency:
             await asyncio.sleep(self._latency)
@@ -296,6 +313,24 @@ class VirtualTenantAPI:
             return
         await self._send_json(writer, 200, obj)
 
+    async def _admin_faults(self, writer: asyncio.StreamWriter, body: bytes) -> None:
+        try:
+            fault = json.loads(body)
+            clusters = {int(index) for index in fault.get("outageClusters", [])}
+            if not clusters.issubset(self._clusters_by_index):
+                raise ValueError("unknown cluster")
+        except (TypeError, ValueError, json.JSONDecodeError):
+            await self._send_json(writer, 400, {"error": "invalid fault configuration"})
+            return
+        self._outage_clusters = clusters
+        if fault.get("dropWatches", False):
+            tasks = tuple(self._watch_tasks)
+            for task in tasks:
+                task.cancel()
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)
+        await self._send_json(writer, 200, {"outageClusters": sorted(clusters)})
+
     async def _csr_request(self, writer: asyncio.StreamWriter, method: str, cluster_index: int, name: str, body: bytes) -> None:
         name = name.split("/", 1)[0]
         obj = self._csrs[cluster_index].get(name)
@@ -303,7 +338,14 @@ class VirtualTenantAPI:
             await self._send_json(writer, 404, {"kind": "Status", "status": "Failure", "reason": "NotFound"})
             return
         if method == "PUT" and body:
-            obj = json.loads(body)
+            was_approved = any(condition.get("type") == "Approved" for condition in obj.get("status", {}).get("conditions", []))
+            if body.startswith(b"k8s\x00"):
+                obj = copy.deepcopy(obj)
+                obj["status"] = decode_csr_approval(body, name)
+            else:
+                obj = json.loads(body)
+            if not was_approved and any(condition.get("type") == "Approved" for condition in obj.get("status", {}).get("conditions", [])):
+                self._csr_approvals += 1
             self._resource_version += 1
             obj.setdefault("metadata", {})["resourceVersion"] = str(self._resource_version)
             self._csrs[cluster_index][name] = obj

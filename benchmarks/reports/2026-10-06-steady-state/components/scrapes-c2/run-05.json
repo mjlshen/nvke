@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "mode": "prometheus",
+  "scenario": {
+    "name": "cluster-axis-100-clusters-5000-nodes",
+    "seed": 20260911,
+    "clusters": 100,
+    "nodes": 5000,
+    "distribution": "balanced",
+    "ready_fraction": 0.99
+  },
+  "startedAt": "2026-10-06T15:48:17.367998Z",
+  "environment": {
+    "architecture": "arm64",
+    "goMaxProcs": 12,
+    "goVersion": "go1.27.1",
+    "os": "darwin",
+    "revision": "a4b4f2a21cf3344ca19138ed4f5bbe099f430cb4"
+  },
+  "phases": [
+    {
+      "name": "fixture-seed",
+      "durationMs": 5980.811,
+      "metrics": {
+        "clusters": 100,
+        "conditionsPerNode": 16,
+        "expectedQueriesPerScrape": 7,
+        "expectedSeriesPerScrape": 100100,
+        "nodePools": 1000,
+        "nodeSets": 10000,
+        "nodes": 5000
+      }
+    },
+    {
+      "name": "prometheus-scrapes",
+      "durationMs": 8854.742,
+      "metrics": {
+        "databaseErrors": 0,
+        "databaseQueries": 84,
+        "databaseQueriesPerScrape": 7,
+        "databaseWaitCount": 0,
+        "databaseWaitNanos": 0,
+        "expectedDatabaseQueries": 84,
+        "gcCycles": 43,
+        "gcPauseNanos": 5776377,
+        "heapAllocDeltaBytes": 238316536,
+        "heapObjectsDelta": 5077385,
+        "incompleteScrapes": 0,
+        "mallocsDelta": 60081593,
+        "mallocsPerScrape": 5006799,
+        "maxDurationMs": 893.904,
+        "medianDurationMs": 567.254,
+        "minDurationMs": 500.052,
+        "p95DurationMs": 893.904,
+        "queryProfile": {
+          "cluster-list": {
+            "averageDurationMs": 6.486,
+            "count": 12,
+            "countPerScrape": 1,
+            "durationMsPerScrape": 6.4864999999999995,
+            "maxDurationMs": 12.729,
+            "totalDurationMs": 77.838
+          },
+          "node-conditions": {
+            "averageDurationMs": 81.855,
+            "count": 12,
+            "countPerScrape": 1,
+            "durationMsPerScrape": 81.85508333333333,
+            "maxDurationMs": 160.844,
+            "totalDurationMs": 982.261
+          },
+          "node-info": {
+            "averageDurationMs": 42.739,
+            "count": 12,
+            "countPerScrape": 1,
+            "durationMsPerScrape": 42.73925,
+            "maxDurationMs": 80.385,
+            "totalDurationMs": 512.871
+          },
+          "node-lifecycle": {
+            "averageDurationMs": 17.084,
+            "count": 12,
+            "countPerScrape": 1,
+            "durationMsPerScrape": 17.08475,
+            "maxDurationMs": 22.375,
+            "totalDurationMs": 205.017
+          },
+          "node-pool-aggregates": {
+            "averageDurationMs": 20.029,
+            "count": 12,
+            "countPerScrape": 1,
+            "durationMsPerScrape": 20.029166666666665,
+            "maxDurationMs": 31.739,
+            "totalDurationMs": 240.35
+          },
+          "node-pool-list": {
+            "averageDurationMs": 24.768,
+            "count": 12,
+            "countPerScrape": 1,
+            "durationMsPerScrape": 24.768583333333336,
+            "maxDurationMs": 45.918,
+            "totalDurationMs": 297.223
+          },
+          "node-set-list": {
+            "averageDurationMs": 47.214,
+            "count": 12,
+            "countPerScrape": 1,
+            "durationMsPerScrape": 47.21408333333333,
+            "maxDurationMs": 81.495,
+            "totalDurationMs": 566.569
+          }
+        },
+        "responseBytesPerScrape": 18756273,
+        "scrapeConcurrency": 2,
+        "scrapeIntervalMs": 1000,
+        "scrapesCompleted": 12,
+        "scrapesRequested": 12,
+        "seriesPerScrape": 100100,
+        "statusFailures": 0,
+        "totalAllocBytesPerScrape": 250596709,
+        "totalAllocDeltaBytes": 3007160512,
+        "totalResponseBytes": 225075276,
+        "totalSeries": 1201200
+      }
+    }
+  ],
+  "metrics": {
+    "database": {
+      "errors": 0,
+      "idleConnections": 2,
+      "inUseConnections": 0,
+      "maxIdleClosed": 0,
+      "maxIdleTimeClosed": 0,
+      "maxLifetimeClosed": 0,
+      "maxOpenConnections": 32,
+      "openConnections": 2,
+      "queries": 135,
+      "waitCount": 0,
+      "waitDurationNanos": 0
+    },
+    "runtime": {
+      "gcCycles": 69,
+      "gcPauseTotalNanos": 8446960,
+      "goroutines": 4,
+      "heapAllocBytes": 241892120,
+      "heapObjects": 5094652,
+      "totalAllocBytes": 3388372712
+    },
+    "topology": {
+      "clusters": 100,
+      "conditionsPerNode": 16,
+      "expectedQueriesPerScrape": 7,
+      "expectedSeriesPerScrape": 100100,
+      "nodePools": 1000,
+      "nodeSets": 10000,
+      "nodes": 5000
+    },
+    "warmup": {
+      "incompleteScrapes": 0,
+      "maxDurationMs": 545.715,
+      "medianDurationMs": 545.715,
+      "minDurationMs": 545.715,
+      "p95DurationMs": 545.715,
+      "responseBytesPerScrape": 18756273,
+      "scrapesCompleted": 1,
+      "seriesPerScrape": 100100,
+      "statusFailures": 0,
+      "totalResponseBytes": 18756273,
+      "totalSeries": 100100
+    }
+  },
+  "errors": []
+}

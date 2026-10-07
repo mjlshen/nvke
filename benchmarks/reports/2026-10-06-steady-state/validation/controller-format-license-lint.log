@@ -1,0 +1,7 @@
+go run mvdan.cc/gofumpt@v0.11.0 -w -extra .
+go run golang.org/x/tools/cmd/goimports@v0.48.0 -w -local github.com/dsx-ai-factory/nke/controller .
+go run github.com/google/addlicense@v1.1.1 -f /Users/mishen/git/nke/nke/hack/license-header.tmpl -c "NVIDIA CORPORATION & AFFILIATES" -ignore '.local/**' -ignore 'hack/**' -ignore 'test/fixtures/profiles/**' -ignore 'test/fixtures/capnico-crds/**' -ignore '**/testUserData.yaml' -ignore 'internal/kubeadmconfig/testdata/**' -ignore 'internal/controllers/tenantaccess/testdata/**' -ignore 'nico-sim/ui/vendor/**' -ignore 'nico-sim/test/integration/testutil/testdata/**' -ignore 'nico-sim/.dev/**' -ignore 'deploy/charts/**' .
+level=warning msg="[formatter] gofumpt: `extra-rules` is deprecated, please use `extra.group-params` instead."
+level=warning msg="The linter 'exhaustruct' is deprecated (since v2.13.0) due to: new major version. Replaced by exhaustruct_v5."
+level=warning msg="[formatter] gofumpt: `extra-rules` is deprecated, please use `extra.group-params` instead."
+0 issues.

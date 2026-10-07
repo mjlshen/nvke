@@ -21,6 +21,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
+	"google.golang.org/grpc/metadata"
 	"k8s.io/apimachinery/pkg/types"
 	controllermetrics "sigs.k8s.io/controller-runtime/pkg/metrics"
 
@@ -35,6 +36,7 @@ import (
 )
 
 const (
+	metricNodes                   = "nodes"
 	phaseFixtureSeed              = "fixture-seed"
 	simulatedNodeConditionMessage = "deterministic virtual node"
 )
@@ -49,12 +51,15 @@ type TenantOptions struct {
 
 // AgentOptions configures the node-agent readiness lane.
 type AgentOptions struct {
-	DSN          string
-	Concurrency  int
-	SteadySweeps int
-	Delay        time.Duration
-	FailureEvery uint64
-	Timeout      time.Duration
+	DSN             string
+	Concurrency     int
+	SteadySweeps    int
+	Delay           time.Duration
+	FailureEvery    uint64
+	Timeout         time.Duration
+	SlowEvery       uint64
+	SlowDelay       time.Duration
+	FailedNodeEvery uint64
 }
 
 type countingFactory struct {
@@ -144,7 +149,7 @@ func RunTenant(ctx context.Context, inventory Inventory, options TenantOptions, 
 	result.Phases = append(result.Phases, Phase{
 		Name:       "tenant-initial-reconciliation",
 		DurationMS: elapsedMS(initialReconcileStart),
-		Metrics:    map[string]any{"nodes": inventory.NodeCount()},
+		Metrics:    map[string]any{metricNodes: inventory.NodeCount()},
 	})
 
 	eventCount := min(options.EventCount, len(inventory.Clusters))
@@ -269,11 +274,18 @@ func controllerIsQuiescent(metrics map[string]float64) bool {
 // against one shared node-agent simulator with bounded worker concurrency.
 func RunAgentHealth(ctx context.Context, inventory Inventory, options AgentOptions, logger *slog.Logger) (Result, error) {
 	result := NewResult("agent-health", inventory)
+	result.Metrics["configuration"] = map[string]any{
+		"concurrency": options.Concurrency, "agentDelay": options.Delay.String(),
+		"failureEvery": options.FailureEvery, "probeTimeout": options.Timeout.String(),
+		"steadySweeps": options.SteadySweeps, "transport": "plaintext", "scheduler": "direct-sweeps",
+		"slowNodeEvery": options.SlowEvery, "slowNodeDelay": options.SlowDelay.String(), "failedNodeEvery": options.FailedNodeEvery,
+	}
 	simulator, err := StartAgentSimulator(ctx, "127.0.0.1:0", options.Delay, options.FailureEvery)
 	if err != nil {
 		return result, err
 	}
 	defer simulator.Stop()
+	simulator.ConfigureCohort(options.SlowEvery, options.SlowDelay, options.FailedNodeEvery)
 	_, port, err := net.SplitHostPort(simulator.Address())
 	if err != nil {
 		return result, fmt.Errorf("splitting simulated agent address: %w", err)
@@ -336,6 +348,12 @@ func runAgentHealthSweep(
 ) (Phase, error) {
 	databaseBefore := store.Bun.DBStats()
 	keys := make(chan dbreconcile.Key)
+	ordinals := make(map[uuid.UUID]int, inventory.NodeCount())
+	for _, cluster := range inventory.Clusters {
+		for _, node := range cluster.Nodes {
+			ordinals[node.ID] = len(ordinals) + 1
+		}
+	}
 	errorsChannel := make(chan error, inventory.NodeCount())
 	var workers sync.WaitGroup
 	for range concurrency {
@@ -343,7 +361,8 @@ func runAgentHealthSweep(
 		go func() {
 			defer workers.Done()
 			for key := range keys {
-				if _, reconcileErr := reconciler.Reconcile(ctx, key); reconcileErr != nil {
+				probeCtx := metadata.AppendToOutgoingContext(ctx, "x-perf-node-id", key.ID.String(), "x-perf-node-ordinal", strconv.Itoa(ordinals[key.ID]))
+				if _, reconcileErr := reconciler.Reconcile(probeCtx, key); reconcileErr != nil {
 					errorsChannel <- reconcileErr
 				}
 			}
@@ -363,13 +382,16 @@ func runAgentHealthSweep(
 		return Phase{}, reconcileErr
 	}
 	databaseAfter := store.Bun.DBStats()
+	duration := time.Since(started)
 	return Phase{
 		DurationMS: elapsedMS(started),
 		Metrics: map[string]any{
-			"nodes":           inventory.NodeCount(),
-			"concurrency":     concurrency,
-			"databaseQueries": databaseAfter.Queries - databaseBefore.Queries,
-			"databaseErrors":  databaseAfter.Errors - databaseBefore.Errors,
+			metricNodes:            inventory.NodeCount(),
+			"concurrency":          concurrency,
+			"databaseQueries":      databaseAfter.Queries - databaseBefore.Queries,
+			"databaseErrors":       databaseAfter.Errors - databaseBefore.Errors,
+			"probesPerSecond":      float64(inventory.NodeCount()) / duration.Seconds(),
+			"withinTwoMinuteSweep": duration <= 2*time.Minute,
 		},
 	}, nil
 }

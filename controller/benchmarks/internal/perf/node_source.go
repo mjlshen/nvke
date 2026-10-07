@@ -21,7 +21,9 @@ import (
 	"github.com/dsx-ai-factory/nke/controller/internal/db"
 )
 
-const sourceCoalesceSettleTime = 1100 * time.Millisecond
+const (
+	sourceCoalesceSettleTime = 1100 * time.Millisecond
+)
 
 // NodeSourceOptions configures the DB-backed node-source seed and resync lane.
 type NodeSourceOptions struct {
@@ -35,8 +37,6 @@ type NodeSourceOptions struct {
 type benchmarkNodeSource struct {
 	source *dbwrapper.NodeEventSource[dbreconcile.Key]
 	queue  workqueue.TypedRateLimitingInterface[dbreconcile.Key]
-	ctx    context.Context
-	cancel context.CancelFunc
 }
 
 type memorySnapshot struct {
@@ -57,6 +57,8 @@ func RunNodeSource(
 	options NodeSourceOptions,
 	logger *slog.Logger,
 ) (Result, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	result := NewResult("node-source", inventory)
 	store, err := OpenStore(ctx, options.DSN, logger)
 	if err != nil {
@@ -76,21 +78,19 @@ func RunNodeSource(
 	var consumed atomic.Int64
 	progress := make(chan struct{}, 1)
 	sources := make([]benchmarkNodeSource, 0, len(inventory.Clusters)*options.CopiesPerCluster)
-	for copyIndex := 0; copyIndex < options.CopiesPerCluster; copyIndex++ {
+	for range options.CopiesPerCluster {
 		for clusterIndex := range inventory.Clusters {
 			clusterID := inventory.Clusters[clusterIndex].ID
-			sourceCtx, cancel := context.WithCancel(ctx)
 			queue := workqueue.NewTypedRateLimitingQueue(
 				workqueue.DefaultTypedControllerRateLimiter[dbreconcile.Key](),
 			)
 			source := dbwrapper.NewNodeSource(store.DB, dbfilters.Node{ClusterID: &clusterID})
-			sources = append(sources, benchmarkNodeSource{source: source, queue: queue, ctx: sourceCtx, cancel: cancel})
+			sources = append(sources, benchmarkNodeSource{source: source, queue: queue})
 			go drainNodeSource(queue, &consumed, progress)
 		}
 	}
 	defer func() {
 		for index := range sources {
-			sources[index].cancel()
 			sources[index].queue.ShutDown()
 		}
 	}()
@@ -109,7 +109,7 @@ func RunNodeSource(
 		eventsPerPass,
 		rowsLoadedPerPass,
 		func(_ context.Context, source benchmarkNodeSource) error {
-			return source.source.Start(source.ctx, source.queue)
+			return source.source.Start(ctx, source.queue)
 		},
 	)
 	result.Phases = append(result.Phases, startupPhase)
@@ -307,9 +307,9 @@ func readMemorySnapshot() memorySnapshot {
 	}
 }
 
-func signedDelta(after, before uint64) int64 {
+func signedDelta(after, before uint64) float64 {
 	if after >= before {
-		return int64(after - before)
+		return float64(after - before)
 	}
-	return -int64(before - after)
+	return -float64(before - after)
 }

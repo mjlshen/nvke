@@ -9,9 +9,9 @@ from benchmarks.cwe_perf.model import Scenario, materialize
 from benchmarks.cwe_perf.tenant_api import VirtualTenantAPI
 
 
-async def request(port: int, method: str, path: str, token: str | None = None, body: dict | None = None) -> tuple[int, dict]:
+async def request(port: int, method: str, path: str, token: str | None = None, body: dict | bytes | None = None) -> tuple[int, dict]:
     reader, writer = await asyncio.open_connection("127.0.0.1", port)
-    payload = json.dumps(body).encode() if body is not None else b""
+    payload = body if isinstance(body, bytes) else json.dumps(body).encode() if body is not None else b""
     headers = [f"{method} {path} HTTP/1.1", "Host: localhost", "Connection: close"]
     if token:
         headers.append(f"Authorization: Bearer {token}")
@@ -27,6 +27,21 @@ async def request(port: int, method: str, path: str, token: str | None = None, b
 
 
 class VirtualTenantAPITest(unittest.IsolatedAsyncioTestCase):
+    async def test_runtime_outage_is_scoped_and_recovers(self) -> None:
+        status, _ = await request(self.port, "POST", "/__admin/faults", body={"outageClusters": [0], "dropWatches": True})
+        self.assertEqual(200, status)
+        status, _ = await request(self.port, "GET", "/clusters/0/api/v1/nodes")
+        self.assertEqual(503, status)
+        status, _ = await request(self.port, "GET", "/clusters/1/api/v1/nodes")
+        self.assertEqual(200, status)
+        await request(self.port, "POST", "/__admin/faults", body={"outageClusters": []})
+        status, _ = await request(self.port, "GET", "/clusters/0/api/v1/nodes")
+        self.assertEqual(200, status)
+
+    async def test_fault_configuration_rejects_unknown_cluster(self) -> None:
+        status, _ = await request(self.port, "POST", "/__admin/faults", body={"outageClusters": [999]})
+        self.assertEqual(400, status)
+
     async def asyncSetUp(self) -> None:
         self.api = VirtualTenantAPI(materialize(Scenario("test", 1, 2, 4)))
         self.server = await self.api.serve("127.0.0.1", 0)
@@ -73,10 +88,24 @@ class VirtualTenantAPITest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(200, status)
         self.assertEqual("False", response["status"]["conditions"][0]["status"])
 
-        await self.api.reset()
+        status, _ = await request(self.port, "POST", "/__admin/reset", body={})
+        self.assertEqual(200, status)
         status, response = await request(self.port, "GET", "/clusters/0/api/v1/nodes/cluster-0000-node-00000")
         self.assertEqual(200, status)
         self.assertEqual("True", response["status"]["conditions"][0]["status"])
+
+    async def test_protobuf_approval_preserves_spec_and_counts_once(self) -> None:
+        from benchmarks.tests.test_protobuf import APPROVAL
+        await request(self.port, "POST", "/__admin/csr-event", body={"cluster": 0, "name": "fixture-csr",
+                      "object": {"spec": {"request": "AA=="}, "status": {}}})
+        path = "/clusters/0/apis/certificates.k8s.io/v1/certificatesigningrequests/fixture-csr/approval"
+        for _ in range(2):
+            status, obj = await request(self.port, "PUT", path, body=APPROVAL)
+            self.assertEqual(200, status)
+            self.assertEqual("AA==", obj["spec"]["request"])
+            self.assertEqual("True", obj["status"]["conditions"][0]["status"])
+        status, stats = await request(self.port, "GET", "/__admin/stats")
+        self.assertEqual(1, stats["csrApprovals"])
 
     async def test_csr_can_be_added_and_approved(self) -> None:
         csr = {"spec": {"request": "AA=="}, "status": {}}

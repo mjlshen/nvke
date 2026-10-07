@@ -1,0 +1,528 @@
+{
+  "cases": {
+    "agent-delay-0ms-c1": {
+      "errors": 0,
+      "flags": [
+        "-agent-delay",
+        "0ms",
+        "-concurrency",
+        "1",
+        "-steady-sweeps",
+        "2"
+      ],
+      "mode": "agent-health",
+      "phases": {
+        "node-agent-health-steady-sweep-01": {
+          "maxMs": 4910.272,
+          "medianMs": 4910.272,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 1018.2733394935394
+          },
+          "minMs": 4910.272
+        },
+        "node-agent-health-steady-sweep-02": {
+          "maxMs": 4277.745,
+          "medianMs": 4277.745,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 1168.8401360816144
+          },
+          "minMs": 4277.745
+        },
+        "node-agent-health-sweep": {
+          "maxMs": 22108.736,
+          "medianMs": 22108.736,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 226.1549406272716
+          },
+          "minMs": 22108.736
+        }
+      },
+      "runs": 1
+    },
+    "agent-delay-100ms-c1": {
+      "errors": 0,
+      "flags": [
+        "-agent-delay",
+        "100ms",
+        "-concurrency",
+        "1",
+        "-steady-sweeps",
+        "2"
+      ],
+      "mode": "agent-health",
+      "phases": {
+        "node-agent-health-steady-sweep-01": {
+          "maxMs": 521941.471,
+          "medianMs": 521941.471,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 9.579618156095126
+          },
+          "minMs": 521941.471
+        },
+        "node-agent-health-steady-sweep-02": {
+          "maxMs": 523263.647,
+          "medianMs": 523263.647,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 9.555412497517414
+          },
+          "minMs": 523263.647
+        },
+        "node-agent-health-sweep": {
+          "maxMs": 547305.797,
+          "medianMs": 547305.797,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 9.135660634596512
+          },
+          "minMs": 547305.797
+        }
+      },
+      "runs": 1
+    },
+    "agent-delay-100ms-c2": {
+      "errors": 0,
+      "flags": [
+        "-agent-delay",
+        "100ms",
+        "-concurrency",
+        "2",
+        "-steady-sweeps",
+        "2"
+      ],
+      "mode": "agent-health",
+      "phases": {
+        "node-agent-health-steady-sweep-01": {
+          "maxMs": 262418.907,
+          "medianMs": 262418.907,
+          "metrics": {
+            "concurrency": 2,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 19.05350517438779
+          },
+          "minMs": 262418.907
+        },
+        "node-agent-health-steady-sweep-02": {
+          "maxMs": 263547.779,
+          "medianMs": 263547.779,
+          "metrics": {
+            "concurrency": 2,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 18.97189203286409
+          },
+          "minMs": 263547.779
+        },
+        "node-agent-health-sweep": {
+          "maxMs": 272646.678,
+          "medianMs": 272646.678,
+          "metrics": {
+            "concurrency": 2,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 18.338752646632475
+          },
+          "minMs": 272646.678
+        }
+      },
+      "runs": 1
+    },
+    "agent-delay-100ms-c4": {
+      "errors": 0,
+      "flags": [
+        "-agent-delay",
+        "100ms",
+        "-concurrency",
+        "4",
+        "-steady-sweeps",
+        "2"
+      ],
+      "mode": "agent-health",
+      "phases": {
+        "node-agent-health-steady-sweep-01": {
+          "maxMs": 132748.918,
+          "medianMs": 132748.918,
+          "metrics": {
+            "concurrency": 4,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 37.66509041117556
+          },
+          "minMs": 132748.918
+        },
+        "node-agent-health-steady-sweep-02": {
+          "maxMs": 133406.757,
+          "medianMs": 133406.757,
+          "metrics": {
+            "concurrency": 4,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 37.47936077181808
+          },
+          "minMs": 133406.757
+        },
+        "node-agent-health-sweep": {
+          "maxMs": 138623.95,
+          "medianMs": 138623.95,
+          "metrics": {
+            "concurrency": 4,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 36.06880318962646
+          },
+          "minMs": 138623.95
+        }
+      },
+      "runs": 1
+    },
+    "agent-delay-100ms-c8": {
+      "errors": 0,
+      "flags": [
+        "-agent-delay",
+        "100ms",
+        "-concurrency",
+        "8",
+        "-steady-sweeps",
+        "2"
+      ],
+      "mode": "agent-health",
+      "phases": {
+        "node-agent-health-steady-sweep-01": {
+          "maxMs": 67893.483,
+          "medianMs": 67893.483,
+          "metrics": {
+            "concurrency": 8,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 73.64477070209115
+          },
+          "minMs": 67893.483
+        },
+        "node-agent-health-steady-sweep-02": {
+          "maxMs": 66920.112,
+          "medianMs": 66920.112,
+          "metrics": {
+            "concurrency": 8,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 74.71595320164137
+          },
+          "minMs": 66920.112
+        },
+        "node-agent-health-sweep": {
+          "maxMs": 69586.677,
+          "medianMs": 69586.677,
+          "metrics": {
+            "concurrency": 8,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 71.85283440131754
+          },
+          "minMs": 69586.677
+        }
+      },
+      "runs": 1
+    },
+    "agent-delay-10ms-c1": {
+      "errors": 0,
+      "flags": [
+        "-agent-delay",
+        "10ms",
+        "-concurrency",
+        "1",
+        "-steady-sweeps",
+        "2"
+      ],
+      "mode": "agent-health",
+      "phases": {
+        "node-agent-health-steady-sweep-01": {
+          "maxMs": 69865.055,
+          "medianMs": 69865.055,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 71.56653646003747
+          },
+          "minMs": 69865.055
+        },
+        "node-agent-health-steady-sweep-02": {
+          "maxMs": 69661.156,
+          "medianMs": 69661.156,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 71.77601257395156
+          },
+          "minMs": 69661.156
+        },
+        "node-agent-health-sweep": {
+          "maxMs": 79307.111,
+          "medianMs": 79307.111,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 63.04604908854421
+          },
+          "minMs": 79307.111
+        }
+      },
+      "runs": 1
+    },
+    "agent-delay-25ms-c1": {
+      "errors": 0,
+      "flags": [
+        "-agent-delay",
+        "25ms",
+        "-concurrency",
+        "1",
+        "-steady-sweeps",
+        "2"
+      ],
+      "mode": "agent-health",
+      "phases": {
+        "node-agent-health-steady-sweep-01": {
+          "maxMs": 151766.669,
+          "medianMs": 151766.669,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 32.945366383619124
+          },
+          "minMs": 151766.669
+        },
+        "node-agent-health-steady-sweep-02": {
+          "maxMs": 147079.047,
+          "medianMs": 147079.047,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 33.995325323212
+          },
+          "minMs": 147079.047
+        },
+        "node-agent-health-sweep": {
+          "maxMs": 160430.836,
+          "medianMs": 160430.836,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 31.166078281343967
+          },
+          "minMs": 160430.836
+        }
+      },
+      "runs": 1
+    },
+    "agent-failed-cohort": {
+      "errors": 0,
+      "flags": [
+        "-failed-node-every",
+        "100",
+        "-steady-sweeps",
+        "2"
+      ],
+      "mode": "agent-health",
+      "phases": {
+        "node-agent-health-steady-sweep-01": {
+          "maxMs": 4012.224,
+          "medianMs": 4012.224,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 1246.191366579372
+          },
+          "minMs": 4012.224
+        },
+        "node-agent-health-steady-sweep-02": {
+          "maxMs": 4234.543,
+          "medianMs": 4234.543,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 1180.7647983770912
+          },
+          "minMs": 4234.543
+        },
+        "node-agent-health-sweep": {
+          "maxMs": 11043.87,
+          "medianMs": 11043.87,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 452.7398337949205
+          },
+          "minMs": 11043.87
+        }
+      },
+      "runs": 1
+    },
+    "agent-slow-cohort": {
+      "errors": 0,
+      "flags": [
+        "-slow-node-every",
+        "100",
+        "-slow-node-delay",
+        "2s",
+        "-steady-sweeps",
+        "2"
+      ],
+      "mode": "agent-health",
+      "phases": {
+        "node-agent-health-steady-sweep-01": {
+          "maxMs": 109363.669,
+          "medianMs": 109363.669,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 45.719021909009726
+          },
+          "minMs": 109363.669
+        },
+        "node-agent-health-steady-sweep-02": {
+          "maxMs": 109490.109,
+          "medianMs": 109490.109,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 45.666225447563626
+          },
+          "minMs": 109490.109
+        },
+        "node-agent-health-sweep": {
+          "maxMs": 117982.489,
+          "medianMs": 117982.489,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 42.379170397883335
+          },
+          "minMs": 117982.489
+        }
+      },
+      "runs": 1
+    },
+    "agent-timeout-cohort": {
+      "errors": 0,
+      "flags": [
+        "-slow-node-every",
+        "100",
+        "-slow-node-delay",
+        "3s",
+        "-timeout",
+        "2s",
+        "-steady-sweeps",
+        "2"
+      ],
+      "mode": "agent-health",
+      "phases": {
+        "node-agent-health-steady-sweep-01": {
+          "maxMs": 108632.549,
+          "medianMs": 108632.549,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 46.02672072296361
+          },
+          "minMs": 108632.549
+        },
+        "node-agent-health-steady-sweep-02": {
+          "maxMs": 109046.016,
+          "medianMs": 109046.016,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 45.85220220377521
+          },
+          "minMs": 109046.016
+        },
+        "node-agent-health-sweep": {
+          "maxMs": 117928.067,
+          "medianMs": 117928.067,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 42.39872772203664
+          },
+          "minMs": 117928.067
+        }
+      },
+      "runs": 1
+    }
+  },
+  "harnessSHA256": "96f7f3d57de799954a8c4e40dd0c47690535ec5c1b01dbecf08b20ac7944ee6e",
+  "platform": "macOS-26.7.1-arm64-arm-64bit-Mach-O",
+  "repetitions": 1,
+  "scenario": {
+    "clusters": 100,
+    "distribution": "balanced",
+    "name": "cluster-axis-100-clusters-5000-nodes",
+    "nodes": 5000,
+    "ready_fraction": 0.99,
+    "seed": 20260911
+  },
+  "schemaVersion": 1,
+  "tenantFailureEvery": 0,
+  "tenantLatencyMs": 0
+}

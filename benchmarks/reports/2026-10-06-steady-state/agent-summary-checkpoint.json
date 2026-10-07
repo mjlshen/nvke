@@ -1,0 +1,305 @@
+{
+  "partial": true,
+  "cases": {
+    "agent-delay-0ms-c1": {
+      "runs": 1,
+      "errors": 0,
+      "phases": {
+        "node-agent-health-sweep": {
+          "medianMs": 22108.736,
+          "minMs": 22108.736,
+          "maxMs": 22108.736,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 226.1549406272716
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 1,
+              "failed": 0
+            }
+          }
+        },
+        "node-agent-health-steady-sweep-01": {
+          "medianMs": 4910.272,
+          "minMs": 4910.272,
+          "maxMs": 4910.272,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 1018.2733394935394
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 1,
+              "failed": 0
+            }
+          }
+        },
+        "node-agent-health-steady-sweep-02": {
+          "medianMs": 4277.745,
+          "minMs": 4277.745,
+          "maxMs": 4277.745,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 1168.8401360816144
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 1,
+              "failed": 0
+            }
+          }
+        }
+      }
+    },
+    "agent-delay-100ms-c1": {
+      "runs": 1,
+      "errors": 0,
+      "phases": {
+        "node-agent-health-sweep": {
+          "medianMs": 547305.797,
+          "minMs": 547305.797,
+          "maxMs": 547305.797,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 9.135660634596512
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 0,
+              "failed": 1
+            }
+          }
+        },
+        "node-agent-health-steady-sweep-01": {
+          "medianMs": 521941.471,
+          "minMs": 521941.471,
+          "maxMs": 521941.471,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 9.579618156095126
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 0,
+              "failed": 1
+            }
+          }
+        },
+        "node-agent-health-steady-sweep-02": {
+          "medianMs": 523263.647,
+          "minMs": 523263.647,
+          "maxMs": 523263.647,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 9.555412497517414
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 0,
+              "failed": 1
+            }
+          }
+        }
+      }
+    },
+    "agent-delay-100ms-c2": {
+      "runs": 1,
+      "errors": 0,
+      "phases": {
+        "node-agent-health-sweep": {
+          "medianMs": 272646.678,
+          "minMs": 272646.678,
+          "maxMs": 272646.678,
+          "metrics": {
+            "concurrency": 2,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 18.338752646632475
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 0,
+              "failed": 1
+            }
+          }
+        },
+        "node-agent-health-steady-sweep-01": {
+          "medianMs": 262418.907,
+          "minMs": 262418.907,
+          "maxMs": 262418.907,
+          "metrics": {
+            "concurrency": 2,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 19.05350517438779
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 0,
+              "failed": 1
+            }
+          }
+        },
+        "node-agent-health-steady-sweep-02": {
+          "medianMs": 263547.779,
+          "minMs": 263547.779,
+          "maxMs": 263547.779,
+          "metrics": {
+            "concurrency": 2,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 18.97189203286409
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 0,
+              "failed": 1
+            }
+          }
+        }
+      }
+    },
+    "agent-delay-10ms-c1": {
+      "runs": 1,
+      "errors": 0,
+      "phases": {
+        "node-agent-health-sweep": {
+          "medianMs": 79307.111,
+          "minMs": 79307.111,
+          "maxMs": 79307.111,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 63.04604908854421
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 1,
+              "failed": 0
+            }
+          }
+        },
+        "node-agent-health-steady-sweep-01": {
+          "medianMs": 69865.055,
+          "minMs": 69865.055,
+          "maxMs": 69865.055,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 71.56653646003747
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 1,
+              "failed": 0
+            }
+          }
+        },
+        "node-agent-health-steady-sweep-02": {
+          "medianMs": 69661.156,
+          "minMs": 69661.156,
+          "maxMs": 69661.156,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 71.77601257395156
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 1,
+              "failed": 0
+            }
+          }
+        }
+      }
+    },
+    "agent-delay-25ms-c1": {
+      "runs": 1,
+      "errors": 0,
+      "phases": {
+        "node-agent-health-sweep": {
+          "medianMs": 160430.836,
+          "minMs": 160430.836,
+          "maxMs": 160430.836,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 30000,
+            "nodes": 5000,
+            "probesPerSecond": 31.166078281343967
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 0,
+              "failed": 1
+            }
+          }
+        },
+        "node-agent-health-steady-sweep-01": {
+          "medianMs": 151766.669,
+          "minMs": 151766.669,
+          "maxMs": 151766.669,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 32.945366383619124
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 0,
+              "failed": 1
+            }
+          }
+        },
+        "node-agent-health-steady-sweep-02": {
+          "medianMs": 147079.047,
+          "minMs": 147079.047,
+          "maxMs": 147079.047,
+          "metrics": {
+            "concurrency": 1,
+            "databaseErrors": 0,
+            "databaseQueries": 5000,
+            "nodes": 5000,
+            "probesPerSecond": 33.995325323212
+          },
+          "booleanChecks": {
+            "withinTwoMinuteSweep": {
+              "passed": 0,
+              "failed": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

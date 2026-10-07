@@ -21,7 +21,10 @@ import (
 	"github.com/dsx-ai-factory/nke/controller/internal/db/migrations"
 )
 
-const benchmarkFixtureKind = "CWEPerformanceFixture"
+const (
+	benchmarkFixtureKind       = "CWEPerformanceFixture"
+	benchmarkKubernetesVersion = "v1.35.0"
+)
 
 // Store owns the PostgreSQL handles used by a benchmark run.
 type Store struct {
@@ -64,7 +67,7 @@ func (s *Store) ResetInventory(ctx context.Context, inventory Inventory) error {
 		Where(
 			"cluster_id IN (SELECT id FROM clusters WHERE capi->'infra_cluster'->>'kind' = ? OR id IN (?))",
 			benchmarkFixtureKind,
-			bun.In(clusterIDs),
+			bun.List(clusterIDs),
 		).
 		Exec(ctx); err != nil {
 		return fmt.Errorf("deleting benchmark nodes: %w", err)
@@ -74,7 +77,7 @@ func (s *Store) ResetInventory(ctx context.Context, inventory Inventory) error {
 		Where(
 			"cluster_id IN (SELECT id FROM clusters WHERE capi->'infra_cluster'->>'kind' = ? OR id IN (?))",
 			benchmarkFixtureKind,
-			bun.In(clusterIDs),
+			bun.List(clusterIDs),
 		).
 		Exec(ctx); err != nil {
 		return fmt.Errorf("clearing benchmark current node sets: %w", err)
@@ -83,7 +86,7 @@ func (s *Store) ResetInventory(ctx context.Context, inventory Inventory) error {
 		Where(
 			"node_pool_id IN (SELECT id FROM node_pools WHERE cluster_id IN (SELECT id FROM clusters WHERE capi->'infra_cluster'->>'kind' = ? OR id IN (?)))",
 			benchmarkFixtureKind,
-			bun.In(clusterIDs),
+			bun.List(clusterIDs),
 		).
 		Exec(ctx); err != nil {
 		return fmt.Errorf("deleting benchmark node sets: %w", err)
@@ -92,13 +95,13 @@ func (s *Store) ResetInventory(ctx context.Context, inventory Inventory) error {
 		Where(
 			"cluster_id IN (SELECT id FROM clusters WHERE capi->'infra_cluster'->>'kind' = ? OR id IN (?))",
 			benchmarkFixtureKind,
-			bun.In(clusterIDs),
+			bun.List(clusterIDs),
 		).
 		Exec(ctx); err != nil {
 		return fmt.Errorf("deleting benchmark node pools: %w", err)
 	}
 	if _, err := s.Bun.NewDelete().Model((*db.Cluster)(nil)).
-		Where("capi->'infra_cluster'->>'kind' = ? OR id IN (?)", benchmarkFixtureKind, bun.In(clusterIDs)).
+		Where("capi->'infra_cluster'->>'kind' = ? OR id IN (?)", benchmarkFixtureKind, bun.List(clusterIDs)).
 		Exec(ctx); err != nil {
 		return fmt.Errorf("deleting benchmark clusters: %w", err)
 	}
@@ -115,7 +118,7 @@ func (s *Store) SeedInventory(ctx context.Context, inventory Inventory, agentAdd
 		clusters = append(clusters, db.Cluster{
 			ID:                sourceCluster.ID,
 			Name:              sourceCluster.Name,
-			KubernetesVersion: "v1.35.0",
+			KubernetesVersion: benchmarkKubernetesVersion,
 			ProviderType:      db.ProviderTypeCAPI,
 			Capi: &db.CAPIClusterProvider{InfraCluster: json.RawMessage(
 				`{"apiVersion":"performance.nke.nvidia.com/v1alpha1","kind":"CWEPerformanceFixture"}`,
@@ -203,7 +206,7 @@ func (s *Store) SeedMetricsInventory(ctx context.Context, inventory Inventory, p
 				KubeReservedMemory:   "1Gi",
 				NodeLabels:           []string{},
 				Conditions:           db.NodePoolConditions{},
-				KubernetesVersion:    "v1.35.0",
+				KubernetesVersion:    benchmarkKubernetesVersion,
 				DesiredCount:         poolNodeCounts[poolIndex],
 				CreatedAt:            now,
 				UpdatedAt:            now,
@@ -216,7 +219,7 @@ func (s *Store) SeedMetricsInventory(ctx context.Context, inventory Inventory, p
 					ID:                   setID,
 					NodePoolID:           poolID,
 					DesiredCount:         setNodeCounts[poolIndex][setIndex],
-					KubernetesVersion:    "v1.35.0",
+					KubernetesVersion:    benchmarkKubernetesVersion,
 					SystemReservedMemory: "16Gi",
 					KubeReservedMemory:   "1Gi",
 					CreatedAt:            now.Add(time.Duration(setIndex) * time.Second),
@@ -243,7 +246,7 @@ func (s *Store) SeedMetricsInventory(ctx context.Context, inventory Inventory, p
 	}
 	if _, err := s.Bun.NewUpdate().Model((*db.NodePool)(nil)).
 		Set("current_node_set_id = (SELECT ns.id FROM node_sets ns WHERE ns.node_pool_id = node_pool.id ORDER BY ns.created_at, ns.id::text LIMIT 1)").
-		Where("cluster_id IN (?)", bun.In(clusterIDs(inventory))).
+		Where("cluster_id IN (?)", bun.List(clusterIDs(inventory))).
 		Exec(ctx); err != nil {
 		return fmt.Errorf("setting benchmark current node sets: %w", err)
 	}
@@ -257,7 +260,7 @@ func benchmarkCluster(source Cluster, now time.Time) db.Cluster {
 	return db.Cluster{
 		ID:                source.ID,
 		Name:              source.Name,
-		KubernetesVersion: "v1.35.0",
+		KubernetesVersion: benchmarkKubernetesVersion,
 		ProviderType:      db.ProviderTypeCAPI,
 		Capi: &db.CAPIClusterProvider{InfraCluster: json.RawMessage(
 			`{"apiVersion":"performance.nke.nvidia.com/v1alpha1","kind":"CWEPerformanceFixture"}`,

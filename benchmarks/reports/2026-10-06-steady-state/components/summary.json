@@ -1,0 +1,525 @@
+{
+  "cases": {
+    "scrapes-c1": {
+      "errors": 0,
+      "flags": [
+        "-node-pools-per-cluster",
+        "10",
+        "-node-sets-per-pool",
+        "10",
+        "-scrapes",
+        "12",
+        "-concurrency",
+        "1",
+        "-scrape-interval",
+        "1s"
+      ],
+      "mode": "prometheus",
+      "phases": {
+        "prometheus-scrapes": {
+          "maxMs": 17327.027,
+          "medianMs": 16659.409,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 84,
+            "databaseQueriesPerScrape": 7,
+            "databaseWaitCount": 0,
+            "databaseWaitNanos": 0,
+            "expectedDatabaseQueries": 84,
+            "gcCycles": 85,
+            "gcPauseNanos": 7819086,
+            "heapAllocDeltaBytes": 129258152,
+            "heapObjectsDelta": 2709564,
+            "incompleteScrapes": 0,
+            "mallocsDelta": 60081708,
+            "mallocsPerScrape": 5006809,
+            "maxDurationMs": 516.894,
+            "medianDurationMs": 463.113,
+            "minDurationMs": 442.538,
+            "p95DurationMs": 516.894,
+            "responseBytesPerScrape": 18756273,
+            "scrapeConcurrency": 1,
+            "scrapeIntervalMs": 1000,
+            "scrapesCompleted": 12,
+            "scrapesRequested": 12,
+            "seriesPerScrape": 100100,
+            "statusFailures": 0,
+            "totalAllocBytesPerScrape": 250606768,
+            "totalAllocDeltaBytes": 3007281224,
+            "totalResponseBytes": 225075276,
+            "totalSeries": 1201200
+          },
+          "minMs": 16555.774
+        }
+      },
+      "runs": 5
+    },
+    "scrapes-c2": {
+      "errors": 0,
+      "flags": [
+        "-node-pools-per-cluster",
+        "10",
+        "-node-sets-per-pool",
+        "10",
+        "-scrapes",
+        "12",
+        "-concurrency",
+        "2",
+        "-scrape-interval",
+        "1s"
+      ],
+      "mode": "prometheus",
+      "phases": {
+        "prometheus-scrapes": {
+          "maxMs": 11907.433,
+          "medianMs": 9376.165,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 84,
+            "databaseQueriesPerScrape": 7,
+            "databaseWaitCount": 0,
+            "databaseWaitNanos": 0,
+            "expectedDatabaseQueries": 84,
+            "gcCycles": 47,
+            "gcPauseNanos": 5776377,
+            "heapAllocDeltaBytes": 216856376,
+            "heapObjectsDelta": 4863328,
+            "incompleteScrapes": 0,
+            "mallocsDelta": 60081623,
+            "mallocsPerScrape": 5006801,
+            "maxDurationMs": 1018.753,
+            "medianDurationMs": 647.891,
+            "minDurationMs": 581.784,
+            "p95DurationMs": 1018.753,
+            "responseBytesPerScrape": 18756273,
+            "scrapeConcurrency": 2,
+            "scrapeIntervalMs": 1000,
+            "scrapesCompleted": 12,
+            "scrapesRequested": 12,
+            "seriesPerScrape": 100100,
+            "statusFailures": 0,
+            "totalAllocBytesPerScrape": 250597876,
+            "totalAllocDeltaBytes": 3007174512,
+            "totalResponseBytes": 225075276,
+            "totalSeries": 1201200
+          },
+          "minMs": 8456.969
+        }
+      },
+      "runs": 5
+    },
+    "scrapes-c4": {
+      "errors": 0,
+      "flags": [
+        "-node-pools-per-cluster",
+        "10",
+        "-node-sets-per-pool",
+        "10",
+        "-scrapes",
+        "12",
+        "-concurrency",
+        "4",
+        "-scrape-interval",
+        "1s"
+      ],
+      "mode": "prometheus",
+      "phases": {
+        "prometheus-scrapes": {
+          "maxMs": 4914.762,
+          "medianMs": 4271.732,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 84,
+            "databaseQueriesPerScrape": 7,
+            "databaseWaitCount": 0,
+            "databaseWaitNanos": 0,
+            "expectedDatabaseQueries": 84,
+            "gcCycles": 33,
+            "gcPauseNanos": 6504048,
+            "heapAllocDeltaBytes": 529603112,
+            "heapObjectsDelta": 11141875,
+            "incompleteScrapes": 0,
+            "mallocsDelta": 60081724,
+            "mallocsPerScrape": 5006810,
+            "maxDurationMs": 852.003,
+            "medianDurationMs": 718.881,
+            "minDurationMs": 659.934,
+            "p95DurationMs": 852.003,
+            "responseBytesPerScrape": 18756273,
+            "scrapeConcurrency": 4,
+            "scrapeIntervalMs": 1000,
+            "scrapesCompleted": 12,
+            "scrapesRequested": 12,
+            "seriesPerScrape": 100100,
+            "statusFailures": 0,
+            "totalAllocBytesPerScrape": 250592564,
+            "totalAllocDeltaBytes": 3007110776,
+            "totalResponseBytes": 225075276,
+            "totalSeries": 1201200
+          },
+          "minMs": 3840.559
+        }
+      },
+      "runs": 5
+    },
+    "source-c10": {
+      "errors": 0,
+      "flags": [
+        "-copies-per-cluster",
+        "2",
+        "-source-concurrency",
+        "10",
+        "-resyncs",
+        "3"
+      ],
+      "mode": "node-source",
+      "phases": {
+        "db-node-source-resync-01": {
+          "maxMs": 5419.697,
+          "medianMs": 5234.678,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 200,
+            "databaseWaitCount": 0,
+            "databaseWaitNanos": 0,
+            "estimatedRowsLoaded": 1000000,
+            "eventsConsumedCumulative": 20000,
+            "gcCycles": 138,
+            "gcPauseNanos": 22686844,
+            "heapAllocDeltaBytes": 38249896,
+            "heapObjectsDelta": 87484,
+            "mallocsDelta": 17090237,
+            "sourceConcurrency": 10,
+            "sources": 200,
+            "targetEventsCumulative": 20000,
+            "totalAllocDeltaBytes": 7203758784
+          },
+          "minMs": 4672.648
+        },
+        "db-node-source-resync-02": {
+          "maxMs": 5173.803,
+          "medianMs": 5014.638,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 200,
+            "databaseWaitCount": 0,
+            "databaseWaitNanos": 0,
+            "estimatedRowsLoaded": 1000000,
+            "eventsConsumedCumulative": 30000,
+            "gcCycles": 136,
+            "gcPauseNanos": 23414577,
+            "heapAllocDeltaBytes": 48077792,
+            "heapObjectsDelta": 94942,
+            "mallocsDelta": 17090083,
+            "sourceConcurrency": 10,
+            "sources": 200,
+            "targetEventsCumulative": 30000,
+            "totalAllocDeltaBytes": 7203761552
+          },
+          "minMs": 4920.85
+        },
+        "db-node-source-resync-03": {
+          "maxMs": 5854.179,
+          "medianMs": 4989.779,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 200,
+            "databaseWaitCount": 0,
+            "databaseWaitNanos": 0,
+            "estimatedRowsLoaded": 1000000,
+            "eventsConsumedCumulative": 40000,
+            "gcCycles": 137,
+            "gcPauseNanos": 21881838,
+            "heapAllocDeltaBytes": 28348720,
+            "heapObjectsDelta": 64597,
+            "mallocsDelta": 17089688,
+            "sourceConcurrency": 10,
+            "sources": 200,
+            "targetEventsCumulative": 40000,
+            "totalAllocDeltaBytes": 7203289368
+          },
+          "minMs": 4772.114
+        },
+        "db-node-source-startup": {
+          "maxMs": 5373.392,
+          "medianMs": 4867.617,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 200,
+            "databaseWaitCount": 0,
+            "databaseWaitNanos": 0,
+            "estimatedRowsLoaded": 1000000,
+            "eventsConsumedCumulative": 10000,
+            "gcCycles": 154,
+            "gcPauseNanos": 26691717,
+            "heapAllocDeltaBytes": 51302328,
+            "heapObjectsDelta": 97737,
+            "mallocsDelta": 17103157,
+            "sourceConcurrency": 10,
+            "sources": 200,
+            "targetEventsCumulative": 10000,
+            "totalAllocDeltaBytes": 7213872440
+          },
+          "minMs": 4665.691
+        }
+      },
+      "runs": 5
+    },
+    "source-c100": {
+      "errors": 0,
+      "flags": [
+        "-copies-per-cluster",
+        "2",
+        "-source-concurrency",
+        "100",
+        "-resyncs",
+        "3"
+      ],
+      "mode": "node-source",
+      "phases": {
+        "db-node-source-resync-01": {
+          "maxMs": 5052.256,
+          "medianMs": 4634.876,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 200,
+            "databaseWaitCount": 168,
+            "databaseWaitNanos": 238954838410,
+            "estimatedRowsLoaded": 1000000,
+            "eventsConsumedCumulative": 20000,
+            "gcCycles": 64,
+            "gcPauseNanos": 21258671,
+            "heapAllocDeltaBytes": 78926224,
+            "heapObjectsDelta": 166190,
+            "mallocsDelta": 17085411,
+            "sourceConcurrency": 100,
+            "sources": 200,
+            "targetEventsCumulative": 20000,
+            "totalAllocDeltaBytes": 7200669264
+          },
+          "minMs": 4356.919
+        },
+        "db-node-source-resync-02": {
+          "maxMs": 5160.47,
+          "medianMs": 4919.121,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 200,
+            "databaseWaitCount": 168,
+            "databaseWaitNanos": 258537882950,
+            "estimatedRowsLoaded": 1000000,
+            "eventsConsumedCumulative": 30000,
+            "gcCycles": 63,
+            "gcPauseNanos": 21069284,
+            "heapAllocDeltaBytes": 71799232,
+            "heapObjectsDelta": 145047,
+            "mallocsDelta": 17085290,
+            "sourceConcurrency": 100,
+            "sources": 200,
+            "targetEventsCumulative": 30000,
+            "totalAllocDeltaBytes": 7200732904
+          },
+          "minMs": 4391.716
+        },
+        "db-node-source-resync-03": {
+          "maxMs": 5073.824,
+          "medianMs": 4674.935,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 200,
+            "databaseWaitCount": 168,
+            "databaseWaitNanos": 234941402790,
+            "estimatedRowsLoaded": 1000000,
+            "eventsConsumedCumulative": 40000,
+            "gcCycles": 63,
+            "gcPauseNanos": 35504909,
+            "heapAllocDeltaBytes": 56929960,
+            "heapObjectsDelta": 114504,
+            "mallocsDelta": 17085220,
+            "sourceConcurrency": 100,
+            "sources": 200,
+            "targetEventsCumulative": 40000,
+            "totalAllocDeltaBytes": 7200297968
+          },
+          "minMs": 4418.501
+        },
+        "db-node-source-startup": {
+          "maxMs": 5149.236,
+          "medianMs": 4621.393,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 200,
+            "databaseWaitCount": 168,
+            "databaseWaitNanos": 238385399712,
+            "estimatedRowsLoaded": 1000000,
+            "eventsConsumedCumulative": 10000,
+            "gcCycles": 68,
+            "gcPauseNanos": 20539871,
+            "heapAllocDeltaBytes": 90525296,
+            "heapObjectsDelta": 166881,
+            "mallocsDelta": 17099984,
+            "sourceConcurrency": 100,
+            "sources": 200,
+            "targetEventsCumulative": 10000,
+            "totalAllocDeltaBytes": 7210632584
+          },
+          "minMs": 4256.309
+        }
+      },
+      "runs": 5
+    },
+    "source-c2": {
+      "errors": 0,
+      "flags": [
+        "-copies-per-cluster",
+        "2",
+        "-source-concurrency",
+        "2",
+        "-resyncs",
+        "3"
+      ],
+      "mode": "node-source",
+      "phases": {
+        "db-node-source-resync-01": {
+          "maxMs": 7837.521,
+          "medianMs": 7580.47,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 200,
+            "databaseWaitCount": 0,
+            "databaseWaitNanos": 0,
+            "estimatedRowsLoaded": 1000000,
+            "eventsConsumedCumulative": 20000,
+            "gcCycles": 230,
+            "gcPauseNanos": 18970842,
+            "heapAllocDeltaBytes": 25203472,
+            "heapObjectsDelta": 55952,
+            "mallocsDelta": 17089182,
+            "sourceConcurrency": 2,
+            "sources": 200,
+            "targetEventsCumulative": 20000,
+            "totalAllocDeltaBytes": 7203100168
+          },
+          "minMs": 7127.04
+        },
+        "db-node-source-resync-02": {
+          "maxMs": 7436.674,
+          "medianMs": 7261.419,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 200,
+            "databaseWaitCount": 0,
+            "databaseWaitNanos": 0,
+            "estimatedRowsLoaded": 1000000,
+            "eventsConsumedCumulative": 30000,
+            "gcCycles": 233,
+            "gcPauseNanos": 20528661,
+            "heapAllocDeltaBytes": 27583552,
+            "heapObjectsDelta": 57401,
+            "mallocsDelta": 17089194,
+            "sourceConcurrency": 2,
+            "sources": 200,
+            "targetEventsCumulative": 30000,
+            "totalAllocDeltaBytes": 7203229664
+          },
+          "minMs": 7093.059
+        },
+        "db-node-source-resync-03": {
+          "maxMs": 7372.19,
+          "medianMs": 7286.948,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 200,
+            "databaseWaitCount": 0,
+            "databaseWaitNanos": 0,
+            "estimatedRowsLoaded": 1000000,
+            "eventsConsumedCumulative": 40000,
+            "gcCycles": 229,
+            "gcPauseNanos": 19551840,
+            "heapAllocDeltaBytes": 26746120,
+            "heapObjectsDelta": 52057,
+            "mallocsDelta": 17088862,
+            "sourceConcurrency": 2,
+            "sources": 200,
+            "targetEventsCumulative": 40000,
+            "totalAllocDeltaBytes": 7202886600
+          },
+          "minMs": 7159.203
+        },
+        "db-node-source-startup": {
+          "maxMs": 7853.526,
+          "medianMs": 7660.226,
+          "metrics": {
+            "databaseErrors": 0,
+            "databaseQueries": 200,
+            "databaseWaitCount": 0,
+            "databaseWaitNanos": 0,
+            "estimatedRowsLoaded": 1000000,
+            "eventsConsumedCumulative": 10000,
+            "gcCycles": 282,
+            "gcPauseNanos": 24190450,
+            "heapAllocDeltaBytes": 28770952,
+            "heapObjectsDelta": 48359,
+            "mallocsDelta": 17100549,
+            "sourceConcurrency": 2,
+            "sources": 200,
+            "targetEventsCumulative": 10000,
+            "totalAllocDeltaBytes": 7213031184
+          },
+          "minMs": 7315.853
+        }
+      },
+      "runs": 5
+    },
+    "tenant-events": {
+      "errors": 0,
+      "flags": [
+        "-events",
+        "100"
+      ],
+      "mode": "tenant",
+      "phases": {
+        "node-event-convergence": {
+          "maxMs": 180.346,
+          "medianMs": 166.131,
+          "metrics": {
+            "events": 99,
+            "requestedEvents": 100
+          },
+          "minMs": 160.565
+        },
+        "tenant-initial-reconciliation": {
+          "maxMs": 7885.175,
+          "medianMs": 7696.065,
+          "metrics": {
+            "nodes": 5000
+          },
+          "minMs": 7451.198
+        },
+        "tenant-manager-cold-start": {
+          "maxMs": 658.739,
+          "medianMs": 463.767,
+          "metrics": {
+            "managers": 100
+          },
+          "minMs": 309.245
+        }
+      },
+      "runs": 5
+    }
+  },
+  "harnessSHA256": "96f7f3d57de799954a8c4e40dd0c47690535ec5c1b01dbecf08b20ac7944ee6e",
+  "platform": "macOS-26.7.1-arm64-arm-64bit-Mach-O",
+  "repetitions": 5,
+  "scenario": {
+    "clusters": 100,
+    "distribution": "balanced",
+    "name": "cluster-axis-100-clusters-5000-nodes",
+    "nodes": 5000,
+    "ready_fraction": 0.99,
+    "seed": 20260911
+  },
+  "schemaVersion": 1,
+  "tenantFailureEvery": 0,
+  "tenantLatencyMs": 0
+}

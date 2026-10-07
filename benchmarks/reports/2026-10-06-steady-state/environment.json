@@ -1,0 +1,28 @@
+{
+  "controllerRevision": "a4b4f2a21cf3344ca19138ed4f5bbe099f430cb4",
+  "controllerModified": true,
+  "go": "1.27.1",
+  "postgres": "17.4",
+  "kubernetes": "v1.37.0",
+  "soakAgentDelay": "10ms",
+  "soakDuration": "2h",
+  "soakSampleInterval": "15s",
+  "soakNodeEventInterval": "30s",
+  "soakCertificateInterval": "5m",
+  "soakTransport": "plaintext",
+  "soakControlPlaneMode": "legacy pool; direct control-plane provisioning disabled",
+  "soakProcessesOverlap": "agent component matrix, initial compilation/tests; timings qualified",
+  "soakBinaries": {
+    "nke-steady-soak-perf": "ec099dcfaa6c0bbdc2562f69d316555641c1b92ce9a80ce96ff387d476b6430b",
+    "nke-steady-soak-worker": "00cc9af8e176c86b6371ae533032ba93c24e6a17ae4589ad9ece9406407ac4cc"
+  },
+  "dockerVMCPUs": 8,
+  "dockerVMMemoryBytes": 16746086400,
+  "hostLogicalCPUs": 12,
+  "hostMemoryBytes": 38654705664,
+  "kind": "0.33.0",
+  "temporalCLI": "1.9.1",
+  "temporalServer": "1.32.0",
+  "workerGOMAXPROCS": 12,
+  "workerResourceLimit": "none (host process)"
+}

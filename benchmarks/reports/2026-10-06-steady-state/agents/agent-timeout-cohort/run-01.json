@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "mode": "agent-health",
+  "scenario": {
+    "name": "cluster-axis-100-clusters-5000-nodes",
+    "seed": 20260911,
+    "clusters": 100,
+    "nodes": 5000,
+    "distribution": "balanced",
+    "ready_fraction": 0.99
+  },
+  "startedAt": "2026-10-06T17:04:33.963674Z",
+  "environment": {
+    "architecture": "arm64",
+    "goMaxProcs": 12,
+    "goVersion": "go1.27.1",
+    "os": "darwin",
+    "revision": "a4b4f2a21cf3344ca19138ed4f5bbe099f430cb4"
+  },
+  "phases": [
+    {
+      "name": "fixture-seed",
+      "durationMs": 310.634
+    },
+    {
+      "name": "node-agent-health-sweep",
+      "durationMs": 117928.067,
+      "metrics": {
+        "concurrency": 1,
+        "databaseErrors": 0,
+        "databaseQueries": 30000,
+        "nodes": 5000,
+        "probesPerSecond": 42.39872772203664,
+        "state": "transition",
+        "withinTwoMinuteSweep": true
+      }
+    },
+    {
+      "name": "node-agent-health-steady-sweep-01",
+      "durationMs": 108632.549,
+      "metrics": {
+        "concurrency": 1,
+        "databaseErrors": 0,
+        "databaseQueries": 5000,
+        "nodes": 5000,
+        "probesPerSecond": 46.02672072296361,
+        "state": "steady",
+        "withinTwoMinuteSweep": true
+      }
+    },
+    {
+      "name": "node-agent-health-steady-sweep-02",
+      "durationMs": 109046.016,
+      "metrics": {
+        "concurrency": 1,
+        "databaseErrors": 0,
+        "databaseQueries": 5000,
+        "nodes": 5000,
+        "probesPerSecond": 45.85220220377521,
+        "state": "steady",
+        "withinTwoMinuteSweep": true
+      }
+    }
+  ],
+  "metrics": {
+    "agentSimulator": {
+      "address": "127.0.0.1:51678",
+      "failures": 0,
+      "identifiedNodes": 5000,
+      "maxProbeAgeMs": 109043.631,
+      "maxProbeGapMs": 117917.38,
+      "outage": false,
+      "requests": 15000,
+      "slowRequests": 150,
+      "timeouts": 150
+    },
+    "configuration": {
+      "agentDelay": "0s",
+      "concurrency": 1,
+      "failedNodeEvery": 0,
+      "failureEvery": 0,
+      "probeTimeout": "2s",
+      "scheduler": "direct-sweeps",
+      "slowNodeDelay": "3s",
+      "slowNodeEvery": 100,
+      "steadySweeps": 2,
+      "transport": "plaintext"
+    },
+    "database": {
+      "errors": 0,
+      "idleConnections": 1,
+      "inUseConnections": 0,
+      "maxIdleClosed": 0,
+      "maxIdleTimeClosed": 0,
+      "maxLifetimeClosed": 0,
+      "maxOpenConnections": 32,
+      "openConnections": 1,
+      "queries": 40021,
+      "waitCount": 0,
+      "waitDurationNanos": 0
+    },
+    "runtime": {
+      "gcCycles": 528,
+      "gcPauseTotalNanos": 43310168,
+      "goroutines": 5,
+      "heapAllocBytes": 9314144,
+      "heapObjects": 50604,
+      "totalAllocBytes": 2294684680
+    }
+  },
+  "errors": []
+}

@@ -4,19 +4,18 @@
 package perf
 
 import (
-	"bufio"
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
 	"net"
 	"net/http"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/uptrace/bun"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -28,7 +27,9 @@ import (
 	"github.com/dsx-ai-factory/nke/controller/internal/controllers/tenantaccess"
 )
 
-const benchmarkManagedByLabelValue = "cloud-workflow-engine"
+const (
+	benchmarkManagedByLabelValue = "cloud-workflow-engine"
+)
 
 // BlackBoxOptions configures a complete CWE worker process run.
 type BlackBoxOptions struct {
@@ -40,6 +41,18 @@ type BlackBoxOptions struct {
 	MetricsURL           string
 	SteadyStateDuration  time.Duration
 	Timeout              time.Duration
+	SampleInterval       time.Duration
+	SamplesPath          string
+	AgentDelay           time.Duration
+	AgentFailureEvery    uint64
+	AgentOutageAfter     time.Duration
+	AgentOutageDuration  time.Duration
+	RestartAfter         time.Duration
+	NodeEventInterval    time.Duration
+	ServingCSRs          bool
+	TenantOutageAfter    time.Duration
+	TenantOutageDuration time.Duration
+	CertificateInterval  time.Duration
 }
 
 // RunBlackBox runs the complete worker against one management cluster. The
@@ -47,7 +60,21 @@ type BlackBoxOptions struct {
 // limits remain explicit and reproducible.
 func RunBlackBox(ctx context.Context, inventory Inventory, options BlackBoxOptions, logger *slog.Logger) (Result, error) {
 	result := NewResult("black-box", inventory)
-	agentSimulator, err := StartAgentSimulator(ctx, "127.0.0.1:0", 0, 0)
+	result.Metrics["configuration"] = map[string]any{
+		"duration": options.SteadyStateDuration.String(), "sampleInterval": options.SampleInterval.String(),
+		"agentDelay": options.AgentDelay.String(), "agentFailureEvery": options.AgentFailureEvery,
+		"agentOutageAfter": options.AgentOutageAfter.String(), "agentOutageDuration": options.AgentOutageDuration.String(),
+		"restartAfter": options.RestartAfter.String(), "agentTransport": "plaintext", "probeIdentity": "aggregate-only",
+		"nodeEventInterval": options.NodeEventInterval.String(), "servingCSRs": options.ServingCSRs,
+		"tenantOutageAfter": options.TenantOutageAfter.String(), "tenantOutageDuration": options.TenantOutageDuration.String(),
+		"certificateInterval": options.CertificateInterval.String(), "certificateOutcome": "simulated-unchanged",
+	}
+	samples, err := openSampleLog(options.SamplesPath)
+	if err != nil {
+		return result, err
+	}
+	defer func() { _ = samples.Close() }()
+	agentSimulator, err := StartAgentSimulator(ctx, "127.0.0.1:0", options.AgentDelay, options.AgentFailureEvery)
 	if err != nil {
 		return result, err
 	}
@@ -61,27 +88,33 @@ func RunBlackBox(ctx context.Context, inventory Inventory, options BlackBoxOptio
 	if err != nil {
 		return result, err
 	}
+	defer store.Cleanup() //nolint:errcheck // partial results still preserve the run outcome
 	setupStart := time.Now()
+	if err := postAdminJSON(ctx, inventory.Clusters[0].Server, "reset", map[string]any{}); err != nil {
+		return result, fmt.Errorf("resetting virtual tenant API: %w", err)
+	}
 	if err := store.ResetInventory(ctx, inventory); err != nil {
-		_ = store.Cleanup()
 		return result, err
 	}
-	if err := store.SeedInventory(ctx, inventory, "127.0.0.1"); err != nil {
-		_ = store.Cleanup()
+	if err := store.SeedMetricsInventory(ctx, inventory, 1, 1); err != nil {
 		return result, err
+	}
+	if _, err := store.Bun.NewUpdate().TableExpr(metricNodes).Set("ip = ?", "127.0.0.1").
+		Set("conditions = jsonb_set(jsonb_set(conditions, '{provisioned,status}', ?::jsonb), '{joined,status}', ?::jsonb)", `"True"`, `"True"`).Where("cluster_id IN (?)", bun.List(clusterIDs(inventory))).Exec(ctx); err != nil {
+		return result, fmt.Errorf("setting simulated agent addresses: %w", err)
+	}
+	if options.CertificateInterval > 0 {
+		if err := seedCertificateNodes(ctx, store, inventory); err != nil {
+			return result, err
+		}
 	}
 	result.Metrics["databaseBeforeWorker"] = databaseStats(store.Bun.DBStats(), store.SQL.Stats())
-	if err := store.Cleanup(); err != nil {
-		return result, fmt.Errorf("closing fixture database: %w", err)
-	}
 	if err := publishTenantSecrets(ctx, options.ManagementKubeconfig, inventory); err != nil {
 		return result, err
 	}
 	result.Phases = append(result.Phases, Phase{Name: phaseFixtureSeed, DurationMS: elapsedMS(setupStart)})
 
-	//nolint:gosec // the benchmark operator explicitly selects the local CWE binary under test
-	command := exec.CommandContext(ctx, options.Binary)
-	command.Env = append(os.Environ(),
+	environment := append(os.Environ(),
 		"KUBECONFIG="+options.ManagementKubeconfig,
 		"DB_CONNECTION_STRING="+options.DSN,
 		"TEMPORAL_HOST_PORT="+options.TemporalHostPort,
@@ -92,43 +125,254 @@ func RunBlackBox(ctx context.Context, inventory Inventory, options BlackBoxOptio
 		"TENANT_ACCESS_ENABLED=true",
 		"NODE_AGENT_PORT="+agentPort,
 		"LOG_LEVEL=warn",
+		"AUTH_CONFIG_PATH=",
+		"SPIFFE_ENABLED=false",
+		"NICO_CONTROLLERS_ENABLED=false",
+		"NODE_HEALTH_CHECK_DISABLED=false",
+		"POD_NAMESPACE=nke-system",
+		"PROVISION_CONTROL_PLANE_WITH_CONTROL_PLANE_CONTROLLER=false",
 	)
-	command.Stdout = os.Stderr
-	command.Stderr = os.Stderr
-	startup := time.Now()
-	if err := command.Start(); err != nil {
-		return result, fmt.Errorf("starting CWE worker: %w", err)
+	if options.CertificateInterval > 0 {
+		environment = append(environment, "CERT_RENEWAL_INTERVAL="+options.CertificateInterval.String())
 	}
-	exited := make(chan error, 1)
-	go func() { exited <- command.Wait() }()
-	if err := waitForProcessReady(ctx, options.ReadyURL, options.Timeout, exited); err != nil {
-		stopProcess(command, exited)
+	startup := time.Now()
+	command, exited, err := startWorker(ctx, options, environment)
+	if err != nil {
 		return result, err
 	}
+	defer func() { stopProcess(command, exited) }()
 	result.Phases = append(result.Phases, Phase{Name: "worker-ready", DurationMS: elapsedMS(startup)})
+	converging := time.Now()
+	if err := waitUntil(ctx, options.Timeout, func() (bool, error) {
+		counts, err := observeInventory(ctx, store, inventory)
+		return counts["probed"] == inventory.NodeCount() && counts["kubernetesObserved"] == inventory.NodeCount(), err
+	}); err != nil {
+		return result, fmt.Errorf("waiting for initial fleet convergence: %w", err)
+	}
+	result.Phases = append(result.Phases, Phase{Name: "worker-initial-convergence", DurationMS: elapsedMS(converging)})
 
+	return measureBlackBox(ctx, options, store, inventory, agentSimulator, environment, command, exited, samples, result)
+}
+
+type workerWorkload struct {
+	events       int
+	tenantOutage bool
+}
+
+func measureBlackBox(
+	ctx context.Context,
+	options BlackBoxOptions,
+	store *Store,
+	inventory Inventory,
+	simulator *AgentSimulator,
+	environment []string,
+	command *exec.Cmd,
+	exited chan error,
+	samples *os.File,
+	result Result,
+) (Result, error) {
+	defer func() { stopProcess(command, exited) }()
+	measurementCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	go scheduleAgentOutage(measurementCtx, simulator, options)
 	steadyStart := time.Now()
-	select {
-	case <-ctx.Done():
-		stopProcess(command, exited)
-		return result, ctx.Err()
-	case processErr := <-exited:
-		return result, fmt.Errorf("CWE worker exited during measurement: %w", processErr)
-	case <-time.After(options.SteadyStateDuration):
+	if options.ServingCSRs {
+		if err := submitServingCSRs(ctx, inventory); err != nil {
+			return result, err
+		}
+		result.Metrics["servingCSRsSubmitted"] = len(inventory.Clusters)
+	}
+	generation := 1
+	workload := workerWorkload{}
+	sampleCount, sampleErrors := 0, 0
+	for {
+		if options.RestartAfter > 0 && generation == 1 && time.Since(steadyStart) >= options.RestartAfter {
+			restarting := time.Now()
+			probesBefore := simulator.requests.Load()
+			stopProcess(command, exited)
+			var err error
+			command, exited, err = startWorker(ctx, options, environment)
+			if err != nil {
+				return result, err
+			}
+			if err := waitUntil(ctx, options.Timeout, func() (bool, error) {
+				return simulator.requests.Load() >= probesBefore+uint64(max(0, inventory.NodeCount())), nil
+			}); err != nil {
+				return result, fmt.Errorf("waiting for post-restart probe sweep: %w", err)
+			}
+			generation++
+			result.Phases = append(result.Phases, Phase{Name: "worker-restart-converged", DurationMS: elapsedMS(restarting)})
+		}
+		if err := workload.apply(ctx, inventory, options, time.Since(steadyStart)); err != nil {
+			return result, err
+		}
+		sampleCtx, sampleCancel := context.WithTimeout(ctx, 15*time.Second)
+		sample := sampleWorker(sampleCtx, options, store, inventory, simulator, steadyStart, generation, command.Process.Pid)
+		sampleCancel()
+		if err := appendSample(samples, sample); err != nil {
+			return result, err
+		}
+		sampleCount++
+		sampleErrors += len(sample.Errors)
+		result.Metrics["lastSample"] = sample
+		result.Metrics["samples"] = sampleCount
+		result.Metrics["sampleErrors"] = sampleErrors
+		result.Metrics["samplesPath"] = options.SamplesPath
+		if time.Since(steadyStart) >= options.SteadyStateDuration {
+			break
+		}
+		if err := waitWorkerInterval(ctx, exited, min(options.SampleInterval, options.SteadyStateDuration-time.Since(steadyStart))); err != nil {
+			return result, err
+		}
 	}
 	result.Phases = append(result.Phases, Phase{Name: "steady-state", DurationMS: elapsedMS(steadyStart)})
-	if metrics, metricsErr := scrapeMetrics(ctx, options.MetricsURL); metricsErr == nil {
-		result.Metrics["prometheus"] = metrics
-	} else {
-		result.Errors = append(result.Errors, metricsErr.Error())
+	if err := finishWorkerWorkload(ctx, options, store, inventory, workload); err != nil {
+		result.Errors = append(result.Errors, err.Error())
 	}
-	result.Metrics["agentSimulator"] = agentSimulator.Stats()
-	if stats, statsErr := tenantAPIStats(ctx, inventory.Clusters[0].Server); statsErr == nil {
-		result.Metrics["tenantAPI"] = stats
+	finalCtx, finalCancel := context.WithTimeout(ctx, 15*time.Second)
+	final := sampleWorker(finalCtx, options, store, inventory, simulator, steadyStart, generation, command.Process.Pid)
+	finalCancel()
+	if err := appendSample(samples, final); err != nil {
+		return result, err
 	}
-	stopProcess(command, exited)
+	result.Metrics["finalSample"] = final
+	checks := map[string]bool{
+		"inventoryPresent":               final.Inventory[metricNodes] == inventory.NodeCount(),
+		"tenantStateRecovered":           final.Inventory["kubernetesReady"] == expectedReadyNodes(inventory),
+		"agentStateRecovered":            final.Inventory["agentReady"] == inventory.NodeCount(),
+		"nodeMetricInventoryComplete":    final.Metrics["harness_samples_nke_controller_node_info"] == float64(inventory.NodeCount()),
+		"clusterMetricInventoryComplete": final.Metrics["harness_samples_nke_controller_cluster_info"] == float64(len(inventory.Clusters)),
+		"servingCSRsApproved":            final.TenantAPI["csrApprovals"] == float64(len(inventory.Clusters)),
+		"samplesSuccessful":              sampleErrors == 0 && len(final.Errors) == 0,
+		"listAPIInventoryComplete":       final.API["clusters"] == len(inventory.Clusters),
+	}
+	result.Metrics["checks"] = checks
+	skipped := map[string]string{}
+	if !options.ServingCSRs {
+		delete(checks, "servingCSRsApproved")
+		skipped["servingCSRsApproved"] = "CSR workload not requested"
+	}
+	if options.AgentFailureEvery > 0 {
+		delete(checks, "agentStateRecovered")
+		skipped["agentStateRecovered"] = "persistent failure injection enabled"
+	}
+	if options.CertificateInterval > 0 {
+		checks["certificateWorkflowsDelivered"] = simulator.certStarts.Load() >= uint64(max(0, len(inventory.Clusters)))
+	}
+	result.Metrics["skippedChecks"] = skipped
+	result.Metrics["totalSamples"] = sampleCount + 1
+	result.Metrics["agentSimulator"] = simulator.Stats()
+	result.Metrics["nodeEventsInjected"] = workload.events
+	result.Metrics["runtimeScope"] = "benchmark-driver; worker runtime is in samples"
 	result.AddRuntimeMetrics()
 	return result, nil
+}
+
+func expectedReadyNodes(inventory Inventory) int {
+	count := 0
+	for _, cluster := range inventory.Clusters {
+		for _, node := range cluster.Nodes {
+			if node.Ready {
+				count++
+			}
+		}
+	}
+	return count
+}
+
+func finishWorkerWorkload(ctx context.Context, options BlackBoxOptions, store *Store, inventory Inventory, workload workerWorkload) error {
+	if workload.tenantOutage {
+		if err := setTenantOutage(ctx, inventory, false); err != nil {
+			return err
+		}
+	}
+	if workload.events%2 != 0 {
+		cluster := inventory.Clusters[(workload.events/2)%len(inventory.Clusters)]
+		node := cluster.Nodes[0]
+		if err := postNodeEvent(ctx, cluster.Server, cluster.Index, node.Name, node.Ready); err != nil {
+			return err
+		}
+	}
+	return waitUntil(ctx, options.Timeout, func() (bool, error) {
+		counts, err := observeInventory(ctx, store, inventory)
+		if err != nil {
+			return false, err
+		}
+		if options.ServingCSRs {
+			stats, statsErr := tenantAPIStats(ctx, inventory.Clusters[0].Server)
+			if statsErr != nil {
+				return false, statsErr
+			}
+			if stats["csrApprovals"] != float64(len(inventory.Clusters)) {
+				return false, nil
+			}
+		}
+		return counts["kubernetesReady"] == expectedReadyNodes(inventory) && (options.AgentFailureEvery > 0 || counts["agentReady"] == inventory.NodeCount()), nil
+	})
+}
+
+func scheduleAgentOutage(ctx context.Context, simulator *AgentSimulator, options BlackBoxOptions) {
+	if options.AgentOutageDuration <= 0 || !waitInterval(ctx, options.AgentOutageAfter) {
+		return
+	}
+	simulator.SetOutage(true)
+	if waitInterval(ctx, options.AgentOutageDuration) {
+		simulator.SetOutage(false)
+	}
+}
+
+func waitWorkerInterval(ctx context.Context, exited <-chan error, interval time.Duration) error {
+	timer := time.NewTimer(interval)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case err := <-exited:
+		return fmt.Errorf("worker exited during measurement: %w", err)
+	case <-timer.C:
+		return nil
+	}
+}
+
+func (w *workerWorkload) apply(ctx context.Context, inventory Inventory, options BlackBoxOptions, elapsed time.Duration) error {
+	outage := options.TenantOutageDuration > 0 && elapsed >= options.TenantOutageAfter && elapsed < options.TenantOutageAfter+options.TenantOutageDuration
+	if outage != w.tenantOutage {
+		if err := setTenantOutage(ctx, inventory, outage); err != nil {
+			return err
+		}
+		w.tenantOutage = outage
+	}
+	if options.NodeEventInterval <= 0 || elapsed < time.Duration(w.events+1)*options.NodeEventInterval {
+		return nil
+	}
+	cluster := inventory.Clusters[(w.events/2)%len(inventory.Clusters)]
+	node := cluster.Nodes[0]
+	ready := node.Ready
+	if w.events%2 == 0 {
+		ready = !ready
+	}
+	if err := postNodeEvent(ctx, cluster.Server, cluster.Index, node.Name, ready); err != nil {
+		return err
+	}
+	w.events++
+	return nil
+}
+
+func startWorker(ctx context.Context, options BlackBoxOptions, environment []string) (*exec.Cmd, chan error, error) {
+	//nolint:gosec // operator selects the benchmark binary
+	command := exec.CommandContext(ctx, options.Binary)
+	command.Env = environment
+	command.Stdout, command.Stderr = os.Stderr, os.Stderr
+	if err := command.Start(); err != nil {
+		return nil, nil, fmt.Errorf("starting worker: %w", err)
+	}
+	exited := make(chan error, 1)
+	go func() { exited <- command.Wait(); close(exited) }()
+	if err := waitForProcessReady(ctx, options.ReadyURL, options.Timeout, exited); err != nil {
+		stopProcess(command, exited)
+		return nil, nil, err
+	}
+	return command, exited, nil
 }
 
 func publishTenantSecrets(ctx context.Context, kubeconfig string, inventory Inventory) error {
@@ -207,11 +451,13 @@ func waitForProcessReady(ctx context.Context, url string, timeout time.Duration,
 }
 
 func stopProcess(command *exec.Cmd, exited <-chan error) {
-	if command.Process == nil {
+	if command == nil || command.Process == nil {
 		return
 	}
-	if command.ProcessState != nil && command.ProcessState.Exited() {
+	select {
+	case <-exited:
 		return
+	default:
 	}
 	_ = command.Process.Signal(syscall.SIGTERM)
 	select {
@@ -220,46 +466,6 @@ func stopProcess(command *exec.Cmd, exited <-chan error) {
 		_ = command.Process.Kill()
 		<-exited
 	}
-}
-
-func scrapeMetrics(ctx context.Context, url string) (map[string]float64, error) {
-	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, http.NoBody)
-	if err != nil {
-		return nil, fmt.Errorf("creating metrics request: %w", err)
-	}
-	response, err := http.DefaultClient.Do(request)
-	if err != nil {
-		return nil, fmt.Errorf("scraping worker metrics: %w", err)
-	}
-	defer response.Body.Close()
-	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("scraping worker metrics returned %s", response.Status)
-	}
-	prefixes := []string{"go_goroutines", "go_memstats_heap_alloc_bytes", "process_cpu_seconds_total", "process_resident_memory_bytes", "workqueue_", "controller_runtime_"}
-	metrics := make(map[string]float64)
-	scanner := bufio.NewScanner(io.LimitReader(response.Body, 16<<20))
-	for scanner.Scan() {
-		line := scanner.Text()
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-		fields := strings.Fields(line)
-		if len(fields) != 2 {
-			continue
-		}
-		name := strings.SplitN(fields[0], "{", 2)[0]
-		if !hasMetricPrefix(name, prefixes) {
-			continue
-		}
-		value, parseErr := strconv.ParseFloat(fields[1], 64)
-		if parseErr == nil {
-			metrics[name] += value
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("reading worker metrics: %w", err)
-	}
-	return metrics, nil
 }
 
 func hasMetricPrefix(name string, prefixes []string) bool {

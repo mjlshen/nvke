@@ -61,6 +61,10 @@ help: ## Display this help.
 
 ##@ Build
 
+.PHONY: perf-build
+perf-build: ## Build the production-path performance driver.
+	go build -o ./bin/cwe-perf ./benchmarks/cmd/cwe-perf
+
 .PHONY: lint
 lint: ## Lint source files. (run by the merge gate)
 	@$(GOLANGCI_LINT_RUN) run --timeout 20m --concurrency 4 --max-same-issues 0 --max-issues-per-linter 0 ./...

@@ -1,0 +1,80 @@
+# coverage.txt is kept: `go tool cover` reads it, and producing it is free.
+# The cobertura.xml conversion that used to follow is gone. It existed for
+# GitLab's coverage visualisation, and that pipeline is gone -- no
+# .gitlab-ci.yml, no workflow reading either file, and both are gitignored.
+# It cost about 9 seconds of download and compile per run on a cold cache,
+# and pulled golang.org/x/tools, 15 MB, to convert one file to XML.
+# nico-sim already produces a coverprofile without it.
+#
+# integration-test/ is behind the `integration_test` build tag, so
+# `go list ./...` no longer needs filtering here. The old grep matched
+# by accident anyway: `.` is a regex wildcard, not a path prefix.
+go test  ./... -coverprofile=coverage.txt -covermode atomic
+	github.com/dsx-ai-factory/nke/controller/benchmarks/cmd/cwe-perf		coverage: 0.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/benchmarks/internal/perf	0.641s	coverage: 18.0% of statements
+	github.com/dsx-ai-factory/nke/controller/cmd/worker		coverage: 0.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/hack/capd-kindest-node	(cached)	coverage: [no statements]
+ok  	github.com/dsx-ai-factory/nke/controller/hack/dsx-identity-exchange-mock	(cached)	coverage: 46.6% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/hack/dsx-imds-attestation/mock	(cached)	coverage: 47.4% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/agent	(cached)	coverage: 14.5% of statements
+	github.com/dsx-ai-factory/nke/controller/internal/agent/agenttest		coverage: 0.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/auth	(cached)	coverage: 92.3% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/capi	(cached)	coverage: 85.3% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/config	(cached)	coverage: 80.5% of statements
+	github.com/dsx-ai-factory/nke/controller/internal/constants		coverage: 0.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/automode	(cached)	coverage: 86.3% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/capi	(cached)	coverage: 81.6% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/certrenewal	(cached)	coverage: 86.4% of statements
+	github.com/dsx-ai-factory/nke/controller/internal/controllers/controllertest		coverage: 0.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/controlplane	(cached)	coverage: 59.1% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/controlplanenodescheduler	(cached)	coverage: 71.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/dbreconcile	(cached)	coverage: 91.4% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/dbreconcile/dbwrapper	(cached)	coverage: 77.2% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/dbreconcile/filters	(cached)	coverage: 44.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/dbreconcile/source	(cached)	coverage: 90.9% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/nodeagentreadiness	(cached)	coverage: 74.5% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/nodepool	(cached)	coverage: 84.4% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/nodepoolnodescheduler	(cached)	coverage: 68.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/nodeprovisioningmonitor	(cached)	coverage: 69.2% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/nodescheduling	(cached)	coverage: 84.6% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/nodeset	(cached)	coverage: 75.2% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/teleporttoken	(cached)	coverage: 87.4% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/tenant	(cached)	coverage: 65.2% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/tenant/csr	(cached)	coverage: 84.8% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/tenant/noderemediation	(cached)	coverage: 77.7% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/tenant/nodestatus	(cached)	coverage: 71.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/tenantaccess	(cached)	coverage: 75.9% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/controllers/tpmpubhashes	(cached)	coverage: 74.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/db	(cached)	coverage: 44.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/db/migrations	(cached)	coverage: 9.8% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/dbmetrics	(cached)	coverage: 85.1% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/kube	(cached)	coverage: 37.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/kubeadmconfig	(cached)	coverage: 87.4% of statements
+	github.com/dsx-ai-factory/nke/controller/internal/kubeadmconfig/thirdparty/bootstraptoken/v1		coverage: 0.0% of statements
+?   	github.com/dsx-ai-factory/nke/controller/internal/kubeadmconfig/thirdparty/kubeadmtypes/v1beta3	[no test files]
+?   	github.com/dsx-ai-factory/nke/controller/internal/kubeadmconfig/thirdparty/kubeadmtypes/v1beta4	[no test files]
+?   	github.com/dsx-ai-factory/nke/controller/internal/kubeadmconfig/thirdparty/kubeletconfig/v1beta1	[no test files]
+?   	github.com/dsx-ai-factory/nke/controller/internal/kubeadmconfig/thirdparty/kubeproxyconfig/v1alpha1	[no test files]
+ok  	github.com/dsx-ai-factory/nke/controller/internal/metrics	(cached)	coverage: 63.6% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/naming	(cached)	coverage: 100.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/nodes	(cached)	coverage: 61.9% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/otelx	(cached)	coverage: 40.8% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/rollout	(cached)	coverage: 74.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/rollout/adapters/cwe	(cached)	coverage: 33.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/rollout/guards/kubevip	(cached)	coverage: 74.8% of statements
+	github.com/dsx-ai-factory/nke/controller/internal/rollout/nodeagent		coverage: 0.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/rollout/operations/dryrun	(cached)	coverage: 41.4% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/rollout/operations/etcd	(cached)	coverage: 65.8% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/rollout/operations/oidc	(cached)	coverage: 82.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/rollout/preflights	(cached)	coverage: 84.7% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/rollout/temporal	(cached)	coverage: 80.5% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/runbook	(cached)	coverage: 94.3% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/server	(cached)	coverage: 72.8% of statements
+	github.com/dsx-ai-factory/nke/controller/internal/spiffe		coverage: 0.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/teleport	(cached)	coverage: 26.9% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/temporal	(cached)	coverage: 0.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/temporal/activities	(cached)	coverage: 54.7% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/temporal/workflows	(cached)	coverage: 48.2% of statements
+	github.com/dsx-ai-factory/nke/controller/internal/testutil		coverage: 0.0% of statements
+ok  	github.com/dsx-ai-factory/nke/controller/internal/utils	(cached)	coverage: 73.7% of statements
+?   	github.com/dsx-ai-factory/nke/controller/internal/version	[no test files]

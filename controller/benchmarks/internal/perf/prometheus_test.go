@@ -53,8 +53,8 @@ func TestSummarizeScrapes(t *testing.T) {
 	require.Equal(t, 1, metrics["incompleteScrapes"])
 	require.Equal(t, 1, metrics["statusFailures"])
 	require.EqualValues(t, 110, metrics["responseBytesPerScrape"])
-	require.Equal(t, 20.0, metrics["medianDurationMs"])
-	require.Equal(t, 30.0, metrics["p95DurationMs"])
+	require.InDelta(t, 20.0, metrics["medianDurationMs"], 0.001)
+	require.InDelta(t, 30.0, metrics["p95DurationMs"], 0.001)
 }
 
 func TestQueryCategory(t *testing.T) {

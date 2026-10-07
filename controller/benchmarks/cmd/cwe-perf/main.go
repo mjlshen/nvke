@@ -77,6 +77,7 @@ func prometheusCommand(ctx context.Context, args []string, logger *slog.Logger) 
 	setsPerPool := flags.Int("node-sets-per-pool", 1, "retained node sets materialized for each node pool")
 	warmups := flags.Int("warmup-scrapes", 1, "unmeasured scrapes before the measurement")
 	scrapes := flags.Int("scrapes", 5, "measured Prometheus scrapes")
+	interval := flags.Duration("scrape-interval", 0, "idle time between scrapes per worker; zero runs back-to-back")
 	concurrency := flags.Int("concurrency", 1, "concurrent Prometheus scrapes")
 	timeout := flags.Duration("timeout", 2*time.Minute, "whole warmup or measured scrape phase timeout")
 	if err := flags.Parse(args); err != nil {
@@ -94,6 +95,9 @@ func prometheusCommand(ctx context.Context, args []string, logger *slog.Logger) 
 	if *scrapes <= 0 {
 		return perf.Result{}, "", fmt.Errorf("-scrapes must be greater than zero")
 	}
+	if *interval < 0 {
+		return perf.Result{}, "", fmt.Errorf("-scrape-interval must not be negative")
+	}
 	if err := configureProfilesDir(*profilesDir); err != nil {
 		return perf.Result{}, "", err
 	}
@@ -103,7 +107,7 @@ func prometheusCommand(ctx context.Context, args []string, logger *slog.Logger) 
 	}
 	result, err := perf.RunPrometheus(ctx, inventory, perf.PrometheusOptions{
 		DSN: *dsn, NodePoolsPerCluster: *poolsPerCluster, NodeSetsPerPool: *setsPerPool,
-		WarmupScrapes: *warmups, Scrapes: *scrapes, Concurrency: *concurrency, Timeout: *timeout,
+		WarmupScrapes: *warmups, Scrapes: *scrapes, Concurrency: *concurrency, Timeout: *timeout, Interval: *interval,
 	}, logger)
 	return result, *output, err
 }
@@ -144,12 +148,18 @@ func agentCommand(ctx context.Context, args []string, logger *slog.Logger) (perf
 	steadySweeps := flags.Int("steady-sweeps", 1, "unchanged readiness sweeps after the initial transition sweep")
 	delay := flags.Duration("agent-delay", 0, "fixed simulated RPC delay")
 	failureEvery := flags.Uint64("agent-failure-every", 0, "fail every Nth RPC; zero disables failures")
+	slowEvery := flags.Uint64("slow-node-every", 0, "add slow-node delay to every Nth identified node")
+	slowDelay := flags.Duration("slow-node-delay", 0, "additional delay for selected slow nodes")
+	failedNodeEvery := flags.Uint64("failed-node-every", 0, "persistently fail every Nth identified node")
 	timeout := flags.Duration("timeout", 2*time.Minute, "per-probe timeout")
 	if err := flags.Parse(args); err != nil {
 		return perf.Result{}, "", err
 	}
 	if *steadySweeps < 0 {
 		return perf.Result{}, "", fmt.Errorf("-steady-sweeps must not be negative")
+	}
+	if *delay < 0 || *slowDelay < 0 {
+		return perf.Result{}, "", fmt.Errorf("agent delays must not be negative")
 	}
 	if err := configureProfilesDir(*profilesDir); err != nil {
 		return perf.Result{}, "", err
@@ -161,6 +171,7 @@ func agentCommand(ctx context.Context, args []string, logger *slog.Logger) (perf
 	result, err := perf.RunAgentHealth(ctx, inventory, perf.AgentOptions{
 		DSN: *dsn, Concurrency: *concurrency, SteadySweeps: *steadySweeps,
 		Delay: *delay, FailureEvery: *failureEvery, Timeout: *timeout,
+		SlowEvery: *slowEvery, SlowDelay: *slowDelay, FailedNodeEvery: *failedNodeEvery,
 	}, logger)
 	return result, *output, err
 }
@@ -209,6 +220,18 @@ func blackBoxCommand(ctx context.Context, args []string, logger *slog.Logger) (p
 	readyURL := flags.String("ready-url", "http://127.0.0.1:8080/readyz", "worker readiness URL")
 	metricsURL := flags.String("metrics-url", "http://127.0.0.1:9090/metrics", "worker Prometheus URL")
 	duration := flags.Duration("duration", 30*time.Second, "steady-state sample duration")
+	sampleInterval := flags.Duration("sample-interval", 15*time.Second, "idle time between worker observations")
+	samplesPath := flags.String("samples", "", "streaming JSONL observations; defaults to output + .samples.jsonl")
+	agentDelay := flags.Duration("agent-delay", 0, "fixed simulated RPC delay")
+	agentFailureEvery := flags.Uint64("agent-failure-every", 0, "fail every Nth RPC")
+	outageAfter := flags.Duration("agent-outage-after", 0, "elapsed time before agent outage")
+	outageDuration := flags.Duration("agent-outage-duration", 0, "agent outage duration; zero disables outage")
+	restartAfter := flags.Duration("restart-after", 0, "restart worker once after elapsed time; zero disables restart")
+	nodeEventInterval := flags.Duration("node-event-interval", 0, "alternate one Node health event per interval; zero disables")
+	servingCSRs := flags.Bool("serving-csrs", false, "submit one valid kubelet-serving CSR per cluster")
+	tenantOutageAfter := flags.Duration("tenant-outage-after", 0, "elapsed time before virtual tenant API outage")
+	tenantOutageDuration := flags.Duration("tenant-outage-duration", 0, "tenant API outage duration; zero disables")
+	certificateInterval := flags.Duration("cert-renewal-interval", 0, "simulate certificate-check workflows on one CP node per cluster at this interval; zero keeps base fixture")
 	timeout := flags.Duration("timeout", 10*time.Minute, "startup timeout")
 	output := flags.String("output", "cwe-perf-result.json", "result JSON path")
 	if err := flags.Parse(args); err != nil {
@@ -216,6 +239,18 @@ func blackBoxCommand(ctx context.Context, args []string, logger *slog.Logger) (p
 	}
 	if *kubeconfig == "" {
 		return perf.Result{}, "", fmt.Errorf("-management-kubeconfig is required")
+	}
+	if *duration <= 0 || *sampleInterval <= 0 || *agentDelay < 0 || *outageAfter < 0 || *outageDuration < 0 || *restartAfter < 0 {
+		return perf.Result{}, "", fmt.Errorf("durations must be positive for measurement/sampling and nonnegative for fault controls")
+	}
+	if (*restartAfter > 0 && *restartAfter >= *duration) || (*outageDuration > 0 && *outageAfter+*outageDuration >= *duration) {
+		return perf.Result{}, "", fmt.Errorf("restart and outage must leave a recovery window within -duration")
+	}
+	if *certificateInterval < 0 || *nodeEventInterval < 0 || *tenantOutageAfter < 0 || *tenantOutageDuration < 0 || (*tenantOutageDuration > 0 && *tenantOutageAfter+*tenantOutageDuration >= *duration) {
+		return perf.Result{}, "", fmt.Errorf("tenant workload durations must be nonnegative and leave a recovery window")
+	}
+	if *samplesPath == "" {
+		*samplesPath = *output + ".samples.jsonl"
 	}
 	if err := configureProfilesDir(*profilesDir); err != nil {
 		return perf.Result{}, "", err
@@ -228,6 +263,12 @@ func blackBoxCommand(ctx context.Context, args []string, logger *slog.Logger) (p
 		Binary: *binary, ManagementKubeconfig: *kubeconfig, DSN: *dsn,
 		TemporalHostPort: *temporal, ReadyURL: *readyURL, MetricsURL: *metricsURL,
 		SteadyStateDuration: *duration, Timeout: *timeout,
+		SampleInterval: *sampleInterval, SamplesPath: *samplesPath,
+		AgentDelay: *agentDelay, AgentFailureEvery: *agentFailureEvery,
+		AgentOutageAfter: *outageAfter, AgentOutageDuration: *outageDuration, RestartAfter: *restartAfter,
+		NodeEventInterval: *nodeEventInterval, ServingCSRs: *servingCSRs,
+		TenantOutageAfter: *tenantOutageAfter, TenantOutageDuration: *tenantOutageDuration,
+		CertificateInterval: *certificateInterval,
 	}, logger)
 	return result, *output, err
 }

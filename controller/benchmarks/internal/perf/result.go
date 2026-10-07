@@ -34,10 +34,14 @@ type Phase struct {
 // NewResult initializes a result with reproducibility metadata.
 func NewResult(mode string, inventory Inventory) Result {
 	revision := "unknown"
+	modified := "unknown"
 	if info, ok := debug.ReadBuildInfo(); ok {
 		for _, setting := range info.Settings {
 			if setting.Key == "vcs.revision" {
 				revision = setting.Value
+			}
+			if setting.Key == "vcs.modified" {
+				modified = setting.Value
 			}
 		}
 	}
@@ -52,6 +56,7 @@ func NewResult(mode string, inventory Inventory) Result {
 			"os":           runtime.GOOS,
 			"architecture": runtime.GOARCH,
 			"revision":     revision,
+			"vcsModified":  modified,
 		},
 		Phases:  []Phase{},
 		Metrics: map[string]any{},

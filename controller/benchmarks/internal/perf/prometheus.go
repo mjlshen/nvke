@@ -33,6 +33,7 @@ type PrometheusOptions struct {
 	Scrapes             int
 	Concurrency         int
 	Timeout             time.Duration
+	Interval            time.Duration
 }
 
 type scrapeObservation struct {
@@ -71,6 +72,7 @@ func RunPrometheus(ctx context.Context, inventory Inventory, options PrometheusO
 		return result, err
 	}
 	topology := prometheusTopology(inventory, options)
+	expectedSeries := prometheusExpectedSeries(inventory, options)
 	result.Phases = append(result.Phases, Phase{
 		Name:       phaseFixtureSeed,
 		DurationMS: elapsedMS(setupStart),
@@ -89,7 +91,7 @@ func RunPrometheus(ctx context.Context, inventory Inventory, options PrometheusO
 		warmupCtx, cancel := context.WithTimeout(ctx, options.Timeout)
 		warmups, warmupErr := runPrometheusScrapes(warmupCtx, handler, options.WarmupScrapes, min(options.Concurrency, options.WarmupScrapes))
 		cancel()
-		result.Metrics["warmup"] = summarizeScrapes(warmups, topology["expectedSeriesPerScrape"].(int64))
+		result.Metrics["warmup"] = summarizeScrapes(warmups, expectedSeries)
 		if warmupErr != nil {
 			return result, fmt.Errorf("warming Prometheus collector: %w", warmupErr)
 		}
@@ -102,18 +104,18 @@ func RunPrometheus(ctx context.Context, inventory Inventory, options PrometheusO
 	poolBefore := store.SQL.Stats()
 	started := time.Now()
 	measurementCtx, cancel := context.WithTimeout(ctx, options.Timeout)
-	observations, scrapeErr := runPrometheusScrapes(measurementCtx, handler, options.Scrapes, options.Concurrency)
+	observations, scrapeErr := runPacedPrometheusScrapes(measurementCtx, handler, options.Scrapes, options.Concurrency, options.Interval)
 	cancel()
 	databaseAfter := store.Bun.DBStats()
 	poolAfter := store.SQL.Stats()
 	memoryAfter := readMemorySnapshot()
 
-	expectedSeries := topology["expectedSeriesPerScrape"].(int64)
 	metrics := summarizeScrapes(observations, expectedSeries)
 	metrics["scrapesRequested"] = options.Scrapes
 	metrics["scrapeConcurrency"] = options.Concurrency
+	metrics["scrapeIntervalMs"] = durationMS(options.Interval)
 	metrics["databaseQueries"] = databaseAfter.Queries - databaseBefore.Queries
-	metrics["expectedDatabaseQueries"] = int64(options.Scrapes) * topology["expectedQueriesPerScrape"].(int64)
+	metrics["expectedDatabaseQueries"] = int64(options.Scrapes) * 7
 	metrics["databaseErrors"] = databaseAfter.Errors - databaseBefore.Errors
 	metrics["databaseWaitCount"] = poolAfter.WaitCount - poolBefore.WaitCount
 	metrics["databaseWaitNanos"] = (poolAfter.WaitDuration - poolBefore.WaitDuration).Nanoseconds()
@@ -126,7 +128,7 @@ func RunPrometheus(ctx context.Context, inventory Inventory, options PrometheusO
 	metrics["queryProfile"] = queries.snapshot(len(observations))
 	if len(observations) > 0 {
 		completed := uint64(len(observations))
-		metrics["databaseQueriesPerScrape"] = (databaseAfter.Queries - databaseBefore.Queries) / uint32(completed)
+		metrics["databaseQueriesPerScrape"] = uint64(databaseAfter.Queries-databaseBefore.Queries) / completed
 		metrics["totalAllocBytesPerScrape"] = (memoryAfter.totalAlloc - memoryBefore.totalAlloc) / completed
 		metrics["mallocsPerScrape"] = (memoryAfter.mallocs - memoryBefore.mallocs) / completed
 	}
@@ -170,7 +172,7 @@ func (p *queryProfile) snapshot(scrapes int) map[string]any {
 			"maxDurationMs":   durationMS(metric.maximum),
 		}
 		if metric.count > 0 {
-			entry["averageDurationMs"] = durationMS(metric.total / time.Duration(metric.count))
+			entry["averageDurationMs"] = durationMS(metric.total) / float64(metric.count)
 		}
 		if scrapes > 0 {
 			entry["countPerScrape"] = float64(metric.count) / float64(scrapes)
@@ -212,17 +214,29 @@ func prometheusTopology(inventory Inventory, options PrometheusOptions) map[stri
 		"clusters":          clusters,
 		"nodePools":         pools,
 		"nodeSets":          nodeSets,
-		"nodes":             nodes,
+		metricNodes:         nodes,
 		"conditionsPerNode": conditionsPerNode,
 		// Conditions, pool aggregates, node info, topology (clusters/pools/sets), and lifecycle.
 		"expectedQueriesPerScrape": int64(7),
 		// Conditions + node info + four pool aggregates + cluster/pool/set info.
 		// The fixture has no active lifecycle condition, so it emits no lifecycle series.
-		"expectedSeriesPerScrape": int64(nodes*conditionsPerNode + nodes + pools*4 + clusters + pools + nodeSets),
+		"expectedSeriesPerScrape": prometheusExpectedSeries(inventory, options),
 	}
 }
 
+func prometheusExpectedSeries(inventory Inventory, options PrometheusOptions) int64 {
+	clusters := len(inventory.Clusters)
+	pools := clusters * options.NodePoolsPerCluster
+	sets := pools * options.NodeSetsPerPool
+	nodes := inventory.NodeCount()
+	return int64(nodes*len(benchmarkNodeConditions().All()) + nodes + pools*5 + clusters + sets)
+}
+
 func runPrometheusScrapes(ctx context.Context, handler http.Handler, count, concurrency int) ([]scrapeObservation, error) {
+	return runPacedPrometheusScrapes(ctx, handler, count, concurrency, 0)
+}
+
+func runPacedPrometheusScrapes(ctx context.Context, handler http.Handler, count, concurrency int, interval time.Duration) ([]scrapeObservation, error) {
 	var next atomic.Int64
 	var workers sync.WaitGroup
 	results := make(chan scrapeObservation, count)
@@ -231,6 +245,7 @@ func runPrometheusScrapes(ctx context.Context, handler http.Handler, count, conc
 		workers.Add(1)
 		go func() {
 			defer workers.Done()
+			completed := false
 			for {
 				index := int(next.Add(1) - 1)
 				if index >= count {
@@ -239,7 +254,11 @@ func runPrometheusScrapes(ctx context.Context, handler http.Handler, count, conc
 				if ctx.Err() != nil {
 					return
 				}
+				if completed && interval > 0 && !waitInterval(ctx, interval) {
+					return
+				}
 				results <- scrapePrometheus(ctx, handler)
+				completed = true
 			}
 		}()
 	}
